@@ -48,11 +48,11 @@ namespace Runtime {
 
             protected:
                 friend struct EntityManager;
-                template<typename T> T *registerComponent() { 
+                template<typename T, typename... Args> T *registerComponent(Args... args) { 
                     static_assert(std::is_base_of_v<Component, T>, "Type must be component");
                     const auto component = m_components.find(Math::getUUID<T>());
                     if (component != m_components.end()) return static_cast<T*>(component->second.get());
-                    m_components.insert_or_assign(Math::getUUID<T>(), std::unique_ptr<Component>((Component *)new T(this)));
+                    m_components.insert_or_assign(Math::getUUID<T>(), std::unique_ptr<Component>((Component *)new T(this, args...)));
                     return getComponent<T>();
                 }
 
