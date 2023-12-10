@@ -1,4 +1,4 @@
-#ifndef _ARCADE_PAC
+#ifndef _ARCADE_PACBASE
 #define _ARCADE_PACBASE
 
 #include <graphics/graphics.hxx>
