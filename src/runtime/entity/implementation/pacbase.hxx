@@ -17,17 +17,32 @@ namespace Runtime {
             struct PacComponent : public Entity::Component {   
                 PacComponent(Entity::Entity *entity): Entity::Component(entity) {}
 
-                movement_tile getCurrentTile() {
+                bool atIntersection() {
+                    auto closesttile = getCurrentTile();
                     auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
-                    if (tilemaps.size() <= 0) return movement_tile(0, 0);
-                    auto tilemap = (Runtime::Pac::Tilemap*)tilemaps.front();
+                    if (tilemaps.size() <= 0) return false;
+                    auto tilemap = getTileMap();
+                    auto tile = movement_tile((m_position*tile_size) + tilemap->position);
+
+                    return tile.x == closesttile.x && tile.y == closesttile.y;
+                }
+
+                Runtime::Pac::Tilemap *getTileMap() {
+                    auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
+                    if (tilemaps.size() <= 0) return nullptr;
+                    return (Runtime::Pac::Tilemap*)tilemaps.front();;
+                }
+
+
+                movement_tile getCurrentTile() {
+                    auto tilemap = getTileMap();
+                    SDL_assert(tilemap != nullptr);
                     return tilemap->getClosestTile(m_position);
                 } 
 
                 movement_tile getNextTile() {
-                    auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
-                    if (tilemaps.size() <= 0) return movement_tile(0, 0);
-                    auto tilemap = (Runtime::Pac::Tilemap*)tilemaps.front();
+                    auto tilemap = getTileMap();
+                    SDL_assert(tilemap != nullptr);
                     Math::pointi offset = Runtime::Pac::vfromd(m_direction)*Runtime::Pac::tile_size/2;
                     Math::pointi nexttilep = m_position + offset;
                     return tilemap->getClosestTile(nexttilep);
@@ -35,9 +50,8 @@ namespace Runtime {
 
                 void update_fixed() {
                     if (!moving) return;
-                    auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
-                    if (tilemaps.size() <= 0) return;
-                    auto tilemap = (Runtime::Pac::Tilemap*)tilemaps.front();
+                    auto tilemap = getTileMap();
+                    SDL_assert(tilemap != nullptr);
                     auto next_tile = getNextTile();
 
                     // Clamp to grid.
