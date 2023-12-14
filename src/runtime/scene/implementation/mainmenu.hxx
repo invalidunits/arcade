@@ -36,10 +36,10 @@ namespace Runtime {
 
         public: 
             MainMenu() {
-                main_menu =        Graphics::loadTexture((void *)ROM::gIMGmainMenuData,      ROM::gIMGmainMenuSize);
-                main_menu_coin =   Graphics::loadTexture((void *)ROM::gIMGmainMenuCoinData,  ROM::gIMGmainMenuCoinSize);
-                main_menu_start =  Graphics::loadTexture((void *)ROM::gIMGmainMenuStartData, ROM::gIMGmainMenuStartSize);
-                main_menu_ghost =  Graphics::loadTexture((void *)ROM::gIMGmainMenuGhostData, ROM::gIMGmainMenuGhostSize);
+                main_menu =        ARDCADE_LOADTEXTROM(IMGmainMenu);
+                main_menu_coin =   ARDCADE_LOADTEXTROM(IMGmainMenuCoin);
+                main_menu_start =  ARDCADE_LOADTEXTROM(IMGmainMenuStart);
+                main_menu_ghost =  ARDCADE_LOADTEXTROM(IMGmainMenuGhost);
             }
 
             

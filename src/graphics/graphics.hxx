@@ -7,6 +7,7 @@
 #include <string>
 #include <system/err.hxx>
 #include <memory>
+#include <rom/rom.hxx>
 
 
 // Define window properties
@@ -31,6 +32,12 @@ namespace Graphics {
 
     shared_texture loadTexture(void *data, std::size_t size);
     shared_surface loadSurface(void *data, std::size_t size);
+
+
+    
+    #define ARDCADE_LOADSURFROM(rom) ::Graphics::loadSurface((void *)ROM::g ## rom ## Data, ROM::g ## rom ## Size) 
+    #define ARDCADE_LOADTEXTROM(rom) ::Graphics::loadTexture((void *)ROM::g ## rom ## Data, ROM::g ## rom ## Size) 
+
     void drawText(Math::recti bounds, std::string_view text, SDL_Renderer *renderer,
         Math::color8a color = Math::color8a(~0, ~0, ~0, ~0), TTF_Font *font = nullptr);
 }
