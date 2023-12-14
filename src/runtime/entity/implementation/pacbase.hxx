@@ -34,18 +34,6 @@ namespace Runtime {
                 }
 
                 void update_fixed() {
-                    auto state = SDL_GetKeyboardState(nullptr);
-                    Math::pointi input = {
-                        state[SDL_SCANCODE_RIGHT] - state[SDL_SCANCODE_LEFT],
-                        state[SDL_SCANCODE_DOWN] - state[SDL_SCANCODE_UP]
-                    };
-                    
-                    if (input.x != 0 || input.y != 0) {
-                        m_direction = Runtime::Pac::dfromv(input);
-                    }
-                    
-
-
                     if (!moving) return;
                     auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
                     if (tilemaps.size() <= 0) return;
@@ -83,6 +71,20 @@ namespace Runtime {
                     registerComponent<PacComponent>();
                 }
 
+                void update_fixed() {
+                    Entity::update_fixed();
+                    auto state = SDL_GetKeyboardState(nullptr);
+                    Math::pointi input = {
+                        state[SDL_SCANCODE_RIGHT] - state[SDL_SCANCODE_LEFT],
+                        state[SDL_SCANCODE_DOWN] - state[SDL_SCANCODE_UP]
+                    };
+                    
+                    if (input.x != 0 || input.y != 0) {
+                       getComponent<PacComponent>()->m_direction = Runtime::Pac::dfromv(input);
+                    }
+                }
+
+                const std::string_view getIdentity() const { return "TestMan"; }
 
                 void draw() {
                     Entity::Entity::draw();
