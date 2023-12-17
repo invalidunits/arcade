@@ -15,6 +15,7 @@ namespace Runtime {
         struct Component: public IUpdate {
             Component(const Entity *entity): m_entity(entity) {}
 
+                inline const Entity * getEntity() const { return m_entity; }
             protected:
                 const Entity *m_entity = nullptr;
         };
@@ -22,7 +23,7 @@ namespace Runtime {
         struct Entity : public IUpdate {
             Entity() {}
 
-            template<typename T> T *getComponent() { 
+            template<typename T> T *getComponent() const { 
                 static_assert(std::is_base_of_v<Component, T>, "Type must be component");
                 const auto component = m_components.find(Math::getUUID<T>());
                 if (component == m_components.end()) return nullptr;

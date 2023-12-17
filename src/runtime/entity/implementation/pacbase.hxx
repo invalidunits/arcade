@@ -18,13 +18,19 @@ namespace Runtime {
                 PacComponent(Entity::Entity *entity): Entity::Component(entity) {}
 
                 bool atIntersection() {
-                    auto closesttile = getCurrentTile();
-                    auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
-                    if (tilemaps.size() <= 0) return false;
-                    auto tilemap = getTileMap();
-                    auto tile = movement_tile((m_position*tile_size) + tilemap->position);
+                    
 
-                    return tile.x == closesttile.x && tile.y == closesttile.y;
+                    auto tile = getCurrentTile();
+                    if (last_tile.x == tile.x && last_tile.y == tile.y) return false;
+                    auto tilemap = getTileMap();
+                    unsigned char path_count = 0;
+
+                    for (unsigned char i = 0; i < (unsigned char)PACDirection::LAST; i++) {
+                        PACDirection direction = (PACDirection)i;
+                        if (tilemap->isBlocked(vfromd(direction) + tile)) continue;
+                        path_count += 1;
+                    }
+                    return path_count > 1; 
                 }
 
                 Runtime::Pac::Tilemap *getTileMap() {
@@ -49,6 +55,7 @@ namespace Runtime {
                 }
 
                 void update_fixed() {
+                    last_tile = getCurrentTile();
                     if (!moving) return;
                     auto tilemap = getTileMap();
                     SDL_assert(tilemap != nullptr);
@@ -73,7 +80,7 @@ namespace Runtime {
                 }
 
                 // bool canProceed();
-
+                movement_tile last_tile = {8, 8}; 
                 Math::pointi m_position = {8, 8}; 
                 bool moving = true ;
                 PACDirection m_direction = PACDirection::RIGHT;

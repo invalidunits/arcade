@@ -18,7 +18,8 @@ namespace Runtime {
             RIGHT = 0,
             UP = 1,
             DOWN = 2,
-            LEFT = 3
+            LEFT = 3,
+            LAST,
         };
 
         constexpr Math::pointi vfromd(PACDirection direction) {
@@ -63,6 +64,12 @@ namespace Runtime {
                 point = point - position;
                 point = point / tile_size;
                 return static_cast<movement_tile>(point);
+            }
+
+            const Math::pointi getTilePosition(movement_tile tile) const {
+                tile = tile + position;
+                tile = tile * tile_size;
+                return static_cast<Math::pointi>(tile);
             }
 
             const bool isBlocked(movement_tile tile) const {

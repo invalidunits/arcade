@@ -50,7 +50,12 @@ namespace Graphics {
         int depth = 0;
         auto rgba = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(data), (int)size, &dimentions.w, &dimentions.h, &depth, STBI_rgb_alpha);
         if (rgba == nullptr) throw std::invalid_argument("data");
-        auto surface = SDL_CreateRGBSurfaceWithFormatFrom(rgba, dimentions.w, dimentions.h, 32, 4*dimentions.w, SDL_PIXELFORMAT_RGBA32);
+        auto surface = SDL_CreateRGBSurfaceWithFormat(0, dimentions.w, dimentions.h, 32, SDL_PIXELFORMAT_RGBA32);
+        SDL_LockSurface(surface);
+        std::memcpy(surface->pixels, rgba, dimentions.w*dimentions.h*4);
+        SDL_UnlockSurface(surface);
+
+
         stbi_image_free(rgba);
         if (!surface) throw sdl_exception();
         return std::shared_ptr<SDL_Surface>(surface, sdl_deleter());
@@ -58,22 +63,9 @@ namespace Graphics {
 
     shared_texture loadTexture(void *data, std::size_t size) {
         Math::pointi dimentions;
-        int depth = 0;
-        auto rgba = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(data), (int)size, &dimentions.w, &dimentions.h, &depth, STBI_rgb_alpha);
-        if (rgba == nullptr) throw std::invalid_argument("data");
 
-
-        int pitch = 0;
-        auto texture = SDL_CreateTexture(Graphics::renderer, SDL_PIXELFORMAT_RGBA32, 
-                    SDL_TEXTUREACCESS_STREAMING,
-                    dimentions.x, dimentions.y);        
-        if (!texture) throw sdl_exception();
-        void *target = nullptr;
-        if (SDL_LockTexture(texture, nullptr, &target, &pitch)) throw sdl_exception();
-        std::memcpy((void*)target, rgba, dimentions.h*dimentions.w*depth);
-        stbi_image_free(rgba);
-        SDL_UnlockTexture(texture);
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+        shared_surface surf = loadSurface(data, size);
+        auto texture = SDL_CreateTextureFromSurface(Graphics::renderer, surf.get());
         return std::shared_ptr<SDL_Texture>(texture, sdl_deleter());
     }
 

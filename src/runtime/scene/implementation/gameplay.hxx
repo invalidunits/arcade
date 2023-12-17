@@ -8,6 +8,7 @@
 
 #include <runtime/entity/implementation/pacbase.hxx>
 #include <runtime/entity/implementation/tileset.hxx>
+#include <runtime/entity/implementation/ghost.hxx>
 #include <runtime/entity/entity.hxx>
 
 namespace Runtime {
@@ -15,6 +16,9 @@ namespace Runtime {
         void setup() {
             m_entities.push_back(std::make_unique<Runtime::Pac::Tilemap>());
             m_entities.push_back(std::make_unique<Runtime::Pac::TestMan>());
+            m_entities.push_back(std::make_unique<Runtime::Pac::Ghost::Blinky>());
+            m_entities.push_back(std::make_unique<Runtime::Pac::Ghost::Pinky>());
+            m_entities.push_back(std::make_unique<Runtime::Pac::Ghost::Clyde>());
         }
     };
 }

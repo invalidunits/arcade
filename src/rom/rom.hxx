@@ -13,6 +13,11 @@ namespace ROM {
 
         INCBIN_EXTERN(IMGmaze);
         INCBIN_EXTERN(IMGmazeCollision);
+        
+        INCBIN_EXTERN(IMGghostInky);
+	    INCBIN_EXTERN(IMGghostBlinky);
+	    INCBIN_EXTERN(IMGghostPinky);
+	    INCBIN_EXTERN(IMGghostClyde);  
     }
 }
 
