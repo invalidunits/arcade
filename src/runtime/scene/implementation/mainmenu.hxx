@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <system/com.hxx>
+
 template <typename T>
 std::string to_string_with_precision(const T a_value, const int n = 6)
 {
@@ -52,6 +54,7 @@ namespace Runtime {
                 start_button = key[SDL_SCANCODE_RETURN] != 0;
                 enter_coin = key[SDL_SCANCODE_RIGHT] != 0;
 
+                coin_display += (float)COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed)/100.0;
                 // TODO: Connect this to coin machine and to play button;
                 if (_coin_display != coin_display) {
                     first_coin_update = _coin_display == 0;
@@ -107,14 +110,19 @@ namespace Runtime {
                 SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(ghostframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
                 SDL_RenderCopy(Graphics::renderer, main_menu_ghost.get(), &rect, nullptr);
 
-                
-
-                Graphics::drawText(
-                    Math::recti(80, ARCADE_LOGIC_HEIGHT - cointrans - 12, 0, 0),
-                    "$" + to_string_with_precision(coin_display, 2),
-                    Graphics::renderer, (coin_update_frame > 0? 
+                auto cointdraw = Math::recti(80, ARCADE_LOGIC_HEIGHT - cointrans - 12, 0, 0);
+                auto color =  (coin_update_frame > 0? 
                                     Math::color8a(~0, ~0, ~0, ~0) : 
-                                    Math::color8a(~0, ~0, 0, ~0)));
+                                    Math::color8a(~0, ~0, 0, ~0));
+                if (coin_display > 120.00) 
+                    Graphics::drawText(cointdraw, "STOP IT!",
+                            Graphics::renderer, color);
+                else if (coin_display > 100.0) 
+                    Graphics::drawText(cointdraw, "Too much...",
+                            Graphics::renderer, color);
+                else Graphics::drawText(cointdraw, "$" + to_string_with_precision(coin_display, 2),
+                            Graphics::renderer, color);
+                    
             }
     };
 }

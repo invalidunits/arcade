@@ -12,6 +12,8 @@ using namespace Graphics;
 #include <system/clock.hxx>
 #include <runtime/scene/scene.hxx>
 #include <runtime/scene/implementation/mainmenu.hxx>
+#include <system/com.hxx>
+
 Runtime::duration accumalation = Runtime::duration::zero();
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -33,7 +35,9 @@ int main(int argc, char *argv[]) {
         printf("The application crashed due to the following error: %s", SDL_GetError());
         exit(1);
     }
+
     
+    COM::beginCOMThread();
     Runtime::SceneManager::pushScene<Runtime::MainMenu>();
 
 
@@ -43,6 +47,7 @@ int main(int argc, char *argv[]) {
         SDL_Event event = {};
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                COM::endCOMThread();
                 return 0;
             }
         }
