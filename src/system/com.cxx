@@ -11,31 +11,42 @@
 
 std::mutex                      com_mutex                     = std::mutex();
 constexpr uint32_t              com_baud_rate                 = 115200; 
-constexpr std::string_view      com_coin_prefix               = "@COIN";
-constexpr std::string_view      com_coin_suffix               = "&";
+constexpr char                  com_packet_begin              = '[';
+constexpr char                  com_packet_end                = ']';
+
+// coin_inserted_value
+constexpr char                  com_coin_prefix               = 'C';
+
+
 std::unique_ptr<serial::Serial> serial_port                   = nullptr;
 
-std::thread         serial_thread;
-
+std::thread                     serial_thread;
+std::atomic<bool>               cancel_com;
 
 namespace COM {
     void COMLoop() {
-        std::string prefix = "";
-        while (serial_port->isOpen()) {
+        std::string current_packet = "";
+        while (serial_port->isOpen() && !cancel_com) {
             if (serial_port->available() >= 1) {
-                prefix += serial_port->read(1);
-                if (prefix.length() > com_coin_prefix.length()) 
-                    prefix = prefix.substr(prefix.length()-com_coin_prefix.length());
-                if (prefix == com_coin_prefix) {
-                    std::string coin_value = "";
-                    for (int i = 0; i < 8; i++) {
-                        uint8_t x; serial_port->read(&x, 1);
-                            if (std::isdigit(x)) coin_value += char(x);
-                        if (x == '&') break;
-                    };
+                auto data = serial_port->read(1);
+                if (data[0] == com_packet_begin) {
+                    current_packet = "";
+                    continue;
+                }
 
-                    coin_inserted_value += (uint16_t)std::stoi(coin_value);
-                }         
+                if (data[0] == com_packet_end) {
+                    // Interpret packet.
+
+                    if (current_packet[0] == com_coin_prefix) {
+                        int value = 0;
+                        try  {
+                            value += std::stoi(current_packet.substr(1));
+                        } catch (...) {}
+                        COM::coin_inserted_value.fetch_add(value, std::memory_order::memory_order_relaxed);
+                    }
+
+                }
+                current_packet += data;
             }
         }
 
@@ -60,12 +71,12 @@ namespace COM {
         
         
         coin_inserted_value.store(0);
-        serial_port->write("# ~Hello World~! :)");
         com_mutex.unlock();
         serial_thread = std::thread(COMLoop);
     }
 
     void endCOMThread(void) {
+        cancel_com = true;
         serial_thread.join();
         serial_port->flush();
         serial_port->close();
