@@ -8,7 +8,7 @@
 #include <system/math.hxx>
 
 #include <system/clock.hxx>
-
+#include <any>
 
 namespace Runtime {
     struct IUpdate {
@@ -24,6 +24,8 @@ namespace Runtime {
         virtual void pause(void) {}
         virtual void resume(void) {}
     };
+
+    std::map<std::string, std::any> global_variables = {}; 
 
     namespace SceneManager {
         inline std::vector<Math::UUID> scene_stack = {};

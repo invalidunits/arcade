@@ -6,6 +6,7 @@
 #include <system/clock.hxx>
 #include "../scene.hxx"
 #include "gameplay.hxx"
+#include "lives.hxx"
 
 #include <string>
 #include <sstream>
@@ -13,14 +14,7 @@
 
 #include <system/com.hxx>
 
-template <typename T>
-std::string to_string_with_precision(const T a_value, const int n = 6)
-{
-    std::stringstream out;
-    out << std::fixed << std::setprecision(n);
-    out << a_value;
-    return std::move(out).str();
-}
+
 
 namespace Runtime {
     class MainMenu : public Scene {
@@ -28,8 +22,6 @@ namespace Runtime {
         Graphics::shared_texture main_menu_ghost = nullptr;
         Graphics::shared_texture main_menu_coin = nullptr;
         Graphics::shared_texture main_menu_start = nullptr;
-        
-        float coin_display = 0;
         float _coin_display = 0;
 
         int coin_update_frame = 0;
@@ -43,7 +35,10 @@ namespace Runtime {
                 main_menu_start =  ARDCADE_LOADTEXTROM(IMGmainMenuStart);
                 main_menu_ghost =  ARDCADE_LOADTEXTROM(IMGmainMenuGhost);
             }
-
+            
+            void setup() {
+                Runtime::coin_display = 0;
+            }
             
             
 
@@ -54,11 +49,16 @@ namespace Runtime {
                 start_button = key[SDL_SCANCODE_RETURN] != 0;
                 enter_coin = key[SDL_SCANCODE_RIGHT] != 0;
 
-                coin_display += (float)COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed)/100.0;
+                
+
+                Runtime::coin_display += (float)COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed)/100.0;
                 // TODO: Connect this to coin machine and to play button;
-                if (_coin_display != coin_display) {
-                    first_coin_update = _coin_display == 0;
-                    _coin_display = coin_display;
+                if (_coin_display != Runtime::coin_display) {
+                    if (can_start()) {
+                        first_coin_update = _coin_display < Runtime::life_value;
+                    }
+                    
+                    _coin_display = Runtime::coin_display;
                     coin_update_frame = 3;
                 }
 
@@ -68,13 +68,12 @@ namespace Runtime {
                     coin_update_frame -= 1;
 
                 if ((frame % 16) == 0) {
-                    coin_update_frame -= 1;
                     if (enter_coin) {
-                        coin_display += 0.25;
+                        Runtime::coin_display += 0.05;
                     }
 
-                    if (start_button) {
-                        Runtime::SceneManager::pushScene<Runtime::Gameplay>();
+                    if (start_button && can_start()) {
+                        Runtime::SceneManager::pushScene<Runtime::LiveCutscene>();
                     }
                 }
 
@@ -92,10 +91,9 @@ namespace Runtime {
                 }
                 SDL_RenderCopy(Graphics::renderer, main_menu.get(), nullptr, nullptr);
                 
-                if (coin_display == 0 || first_coin_update) {
+                if (!can_start() || first_coin_update) {
                     SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(coinframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
                     if (first_coin_update) {
-                        // TODO: There is a math solution to this... 
                         rect.y += cointrans;
                         SDL_SetTextureColorMod(main_menu_coin.get(), 255, 0 , 0);
                     } else {
@@ -110,20 +108,24 @@ namespace Runtime {
                 SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(ghostframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
                 SDL_RenderCopy(Graphics::renderer, main_menu_ghost.get(), &rect, nullptr);
 
-                auto cointdraw = Math::recti(80, ARCADE_LOGIC_HEIGHT - cointrans - 12, 0, 0);
+                auto coindraw = Math::recti(80, ARCADE_LOGIC_HEIGHT - cointrans - 12, 0, 0);
                 auto color =  (coin_update_frame > 0? 
                                     Math::color8a(~0, ~0, ~0, ~0) : 
                                     Math::color8a(~0, ~0, 0, ~0));
-                if (coin_display > 120.00) 
-                    Graphics::drawText(cointdraw, "STOP IT!",
+                if (Runtime::coin_display > 120.00) 
+                    Graphics::drawText(coindraw, "STOP IT!",
                             Graphics::renderer, color);
-                else if (coin_display > 100.0) 
-                    Graphics::drawText(cointdraw, "Too much...",
+                else if (Runtime::coin_display > 100.0) 
+                    Graphics::drawText(coindraw, "Too much...",
                             Graphics::renderer, color);
-                else Graphics::drawText(cointdraw, "$" + to_string_with_precision(coin_display, 2),
+                else Graphics::drawText(coindraw, "$" + Math::to_string_with_precision(Runtime::coin_display, 2),
                             Graphics::renderer, color);
                     
             }
+        
+        static bool can_start(void) {
+            return Runtime::coin_display >= Runtime::life_value;
+        }
     };
 }
 

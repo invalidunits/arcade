@@ -11,6 +11,8 @@ namespace ROM {
 	    INCBIN_EXTERN(IMGmainMenuStart);
         INCBIN_EXTERN(IMGmainMenuGhost);
 
+        INCBIN_EXTERN(IMGpacmanCutscene);
+
         INCBIN_EXTERN(IMGmaze);
         INCBIN_EXTERN(IMGmazeCollision);
         

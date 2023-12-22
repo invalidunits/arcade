@@ -14,7 +14,7 @@ namespace Runtime {
     inline auto delta_time = duration::zero();
     inline auto current_time = clock::now();
 
-    inline auto tick_length = std::chrono::duration_cast<clock::duration>(duration_ms(17));
+    inline constexpr auto tick_length = std::chrono::duration_cast<clock::duration>(duration_ms(20));
     inline unsigned long long current_tick = 0;
 } // namespace Math
 

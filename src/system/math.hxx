@@ -5,6 +5,9 @@
 #include <type_traits>
 #include <algorithm>
 #include <cstdint>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 namespace Math {
     template<typename T> struct vector2 {
@@ -70,8 +73,8 @@ namespace Math {
         constexpr vector4<T> operator /(T scalar) { return vector4<T>(x/scalar, y/scalar, z/scalar, q/scalar); }
         constexpr vector4<T> operator *(T scalar) { return vector4<T>(x*scalar, y*scalar, z*scalar, q/scalar); }
 
-        constexpr vector4<T> operator +(vector4<T> other) { return vector4<T>(x+other.x, y+other.y, q+other.q); }
-        constexpr vector4<T> operator -(vector4<T> other) { return vector4<T>(x-other.x, y-other.y, q+other.q); }
+        constexpr vector4<T> operator +(vector4<T> other) { return vector4<T>(x+other.x, y+other.y, z*other.z, q+other.q); }
+        constexpr vector4<T> operator -(vector4<T> other) { return vector4<T>(x-other.x, y-other.y, z*other.z, q+other.q); }
 
 
         operator SDL_Rect() {
@@ -98,6 +101,15 @@ namespace Math {
     template <typename T> inline UUID getUUID() {
         static UUID ID = _generateUUID();
         return ID;
+    }
+
+    template <typename T>
+    std::string to_string_with_precision(const T a_value, const int n = 6)
+    {
+        std::stringstream out;
+        out << std::fixed << std::setprecision(n);
+        out << a_value;
+        return std::move(out).str();
     }
 
 } // namespace Math
