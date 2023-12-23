@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef _ARCADE_CLOCK
+#define _ARCADE_CLOCK
 
 #include <type_traits>
 #include <algorithm>
@@ -16,8 +16,9 @@ namespace Runtime {
 
     inline constexpr auto tick_length = std::chrono::duration_cast<clock::duration>(duration_ms(20));
     inline unsigned long long current_tick = 0;
-} // namespace Math
+} // namespace Runtime
 
+#endif
 
 
 
