@@ -14,6 +14,7 @@ namespace ROM {
         INCBIN_EXTERN(IMGpacmanCutscene);
 
         INCBIN_EXTERN(IMGmaze);
+        INCBIN_EXTERN(IMGmazeCollectables);
         INCBIN_EXTERN(IMGmazeCollision);
         
         INCBIN_EXTERN(IMGghostInky);

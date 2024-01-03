@@ -100,9 +100,20 @@ namespace Runtime {
                         state[SDL_SCANCODE_DOWN] - state[SDL_SCANCODE_UP]
                     };
                     
+                    auto pac = getComponent<PacComponent>();
                     if (input.x != 0 || input.y != 0) {
-                       getComponent<PacComponent>()->m_direction = Runtime::Pac::dfromv(input);
+                       pac->m_direction = Runtime::Pac::dfromv(input);
                     }
+                    auto tilemap = pac->getTileMap();
+                    auto tile = pac->getCurrentTile();
+                    int tile_index = tile.x + tile.y*tilemap->tilemap_size.w;
+                    if (tile_index < 0)
+                        tile_index = 0;
+
+                    if (tile_index < tilemap->pellets.size())
+                        // Allow super pellet.
+                        tilemap->pellets[tile_index] = Pac::PACPellet::none;
+                    
                 }
 
                 const std::string_view getIdentity() const { return "TestMan"; }

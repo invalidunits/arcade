@@ -38,14 +38,38 @@ namespace Runtime {
                 return vector.x>0?  PACDirection::RIGHT : PACDirection::LEFT;
             else return vector.y<0? PACDirection::UP    : PACDirection::DOWN;
         }
+
+        enum struct PACPellet: unsigned char {
+            none,
+            regular,
+            super
+        };
+
+
         // TODO: Add dynamic loading for multiple tilemaps. Ms. Pacman... etc...
         struct Tilemap: public Runtime::Entity::Entity {
             Tilemap() {
-                tilemap_texture =   Graphics::loadTexture((void *)ROM::gIMGmazeData, ROM::gIMGmazeSize);
+                tilemap_texture =           Graphics::loadTexture((void *)ROM::gIMGmazeData, ROM::gIMGmazeSize);
+                collectables_texture =      Graphics::loadTexture((void*)ROM::gIMGmazeCollectablesData, ROM::gIMGmazeCollectablesSize);
+
                 int x, y, depth;
                 auto collide = stbi_load_from_memory((stbi_uc *)ROM::gIMGmazeCollisionData, ROM::gIMGmazeCollisionSize, &x, &y, &depth, 1);
                 for (size_t i = 0; i < (x*y); i++) {
-                    collision.push_back(collide[i] != 0);
+                    std::printf("%d", (int)collide[i]);
+                    switch (collide[i]) {
+                        case 0:
+                            pellets.push_back(PACPellet::regular);
+                            collision.push_back(false);
+                            break;
+                        case 143:
+                            pellets.push_back(PACPellet::super);
+                            collision.push_back(false);
+                            break;
+                        case 255:
+                            pellets.push_back(PACPellet::none);
+                            collision.push_back(true);
+                            break;
+                    }
                 }
                 stbi_image_free(collide);
 
@@ -58,6 +82,32 @@ namespace Runtime {
                 auto size = tilemap_size*tile_size;
                 SDL_Rect dst = {position.x, position.y, size.w, size.h};
                 SDL_assert(!SDL_RenderCopy(Graphics::renderer, tilemap_texture.get(), {}, &dst));
+
+                for (int i = 0; i < pellets.size(); i++) {
+                    if (pellets[i] != PACPellet::none) {
+                        movement_tile tile = {
+                            i % tilemap_size.w, 
+                            i / tilemap_size.w
+                        };
+
+                        auto pos = Math::pointi(tile*tile_size);
+                        SDL_Rect dst = {
+                            pos.x, pos.y, 8, 8
+                        };
+
+                        SDL_Rect src; 
+                        switch (pellets[i]) {
+                            case PACPellet::regular:
+                                src = {0, 0, 8, 8}; break;
+
+                            case PACPellet::super:
+                                src = {8, 0, 8, 8}; break;
+                        }
+
+                        SDL_assert(!SDL_RenderCopy(Graphics::renderer, collectables_texture.get(), &src, &dst));
+                    }
+                }
+                
             }
 
             const movement_tile getClosestTile(Math::pointi point) const {
@@ -88,8 +138,12 @@ namespace Runtime {
 
             Math::pointi position = {};
             Math::pointi tilemap_size = {};
+
             Graphics::shared_texture tilemap_texture = nullptr;
+            Graphics::shared_texture collectables_texture = nullptr;
+
             std::vector<bool> collision = {};
+            std::vector<PACPellet> pellets = {};     
 
         };
     }
