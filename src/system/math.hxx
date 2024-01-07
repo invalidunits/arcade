@@ -1,7 +1,7 @@
 #ifndef _ARCADE_MATH
 #define _ARCADE_MATH
 
-
+#include <SDL2/SDL_rect.h>
 #include <type_traits>
 #include <algorithm>
 #include <cstdint>

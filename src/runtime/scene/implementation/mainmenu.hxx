@@ -13,8 +13,7 @@
 #include <iomanip>
 
 #include <system/com.hxx>
-
-
+#include <system/controls.hxx>
 
 namespace Runtime {
     class MainMenu : public Scene {
@@ -44,15 +43,13 @@ namespace Runtime {
 
             void update_fixed() {
                 int frame = Runtime::current_tick;
+                bool start_button = (Controls::button_inputs[Controls::BUTTON_A] || Controls::button_inputs[Controls::BUTTON_START]);
                 const Uint8 *key = SDL_GetKeyboardState(nullptr);
-                bool start_button, enter_coin = false;
-                start_button = key[SDL_SCANCODE_RETURN] != 0;
-                enter_coin = key[SDL_SCANCODE_RIGHT] != 0;
-
-                
+                #ifdef DEBUG
+                    bool enter_coin = key[SDL_SCANCODE_RIGHT] != 0; // TODO: Connect enter_coin debug param to a debug macro.
+                #endif
 
                 Runtime::coin_display += (float)COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed)/100.0;
-                // TODO: Connect this to coin machine and to play button;
                 if (_coin_display != Runtime::coin_display) {
                     if (can_start()) {
                         first_coin_update = _coin_display < Runtime::life_value;

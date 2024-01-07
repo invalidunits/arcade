@@ -156,7 +156,7 @@ namespace Runtime {
 
                             // Chase
                             [](GhostComponent *comp) { 
-                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("TestMan");
+                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
                                 if (pacmen.size() > 0) {   
                                     return pacmen[0]->getComponent<PacComponent>()->getCurrentTile();
                                 }
@@ -182,7 +182,7 @@ namespace Runtime {
 
                             // Chase
                             [](GhostComponent *comp) { 
-                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("TestMan");
+                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
                                 if (pacmen.size() > 0) {   
                                     auto pac = pacmen[0]->getComponent<PacComponent>();
                                     return pac->getCurrentTile() + vfromd(pac->m_direction)*5;
@@ -214,7 +214,7 @@ namespace Runtime {
                             [](GhostComponent *comp) { 
                                 auto my_pac = comp->getEntity()->getComponent<PacComponent>();
                                 auto tilemap = my_pac->getTileMap();
-                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("TestMan");
+                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
                                 if (pacmen.size() > 0) {   
                                     auto pac = pacmen[0]->getComponent<PacComponent>();
                                     auto displacement = my_pac->m_position - pac->m_position;

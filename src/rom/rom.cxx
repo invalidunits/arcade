@@ -15,9 +15,9 @@ extern "C" {
 	INCBIN(IMGmainMenuStart, "rom/img/main_menupsb.png");
 	INCBIN(IMGmainMenuGhost, "rom/img/main_menug.png");
 
-	// Cutscene
+	// Pacman
 	INCBIN(IMGpacmanCutscene, "rom/img/pacman/pacman_cutscene.png");
-
+	INCBIN(IMGpacman, "rom/img/pacman/pacman.png");
 
 	// Gameplay
 

@@ -8,6 +8,8 @@
 #include <runtime/entity/entity.hxx>
 #include "tileset.hxx"
 
+#include <system/controls.hxx>
+
 
 namespace Runtime {
     namespace Pac {
@@ -86,24 +88,40 @@ namespace Runtime {
                 PACDirection m_direction = PACDirection::RIGHT;
             };
 
-
-            struct TestMan : public Entity::Entity {
-                TestMan() {
+            constexpr int16_t deadzone = 8192;
+    
+            struct PacMan : public Entity::Entity {
+                PacMan() {
+                    pacman_texture = ARDCADE_LOADTEXTROM(IMGpacman);
                     registerComponent<PacComponent>();
                 }
 
                 void update_fixed() {
                     Entity::update_fixed();
-                    auto state = SDL_GetKeyboardState(nullptr);
-                    Math::pointi input = {
-                        state[SDL_SCANCODE_RIGHT] - state[SDL_SCANCODE_LEFT],
-                        state[SDL_SCANCODE_DOWN] - state[SDL_SCANCODE_UP]
-                    };
-                    
                     auto pac = getComponent<PacComponent>();
+                    auto x_axis_raw = Controls::axis_inputs[Controls::AXIS_X].load();
+                    auto y_axis_raw = Controls::axis_inputs[Controls::AXIS_Y].load();
+
+                    auto x_axis = std::abs(x_axis_raw) > deadzone? (0 < x_axis_raw) - (x_axis_raw < 0) : 0;
+                    auto y_axis = std::abs(y_axis_raw) > deadzone? (0 < y_axis_raw) - (y_axis_raw < 0) : 0;
+                    Math::pointi input = {
+                        x_axis,
+                        y_axis
+                    };
+                            
+
                     if (input.x != 0 || input.y != 0) {
-                       pac->m_direction = Runtime::Pac::dfromv(input);
+                       m_direction_buffer = Runtime::Pac::dfromv(input);
                     }
+                    if (m_direction_buffer != PACDirection::LAST) {
+                        auto dirblocked = (pac->getTileMap()->isBlocked(
+                                pac->getCurrentTile() + vfromd(m_direction_buffer)));
+                        if (!dirblocked) {
+                            pac->m_direction = m_direction_buffer;
+                            m_direction_buffer = PACDirection::LAST;
+                        }
+                    }
+                    
                     auto tilemap = pac->getTileMap();
                     auto tile = pac->getCurrentTile();
                     int tile_index = tile.x + tile.y*tilemap->tilemap_size.w;
@@ -116,17 +134,38 @@ namespace Runtime {
                     
                 }
 
-                const std::string_view getIdentity() const { return "TestMan"; }
+                const std::string_view getIdentity() const { return "PacMan"; }
+                void update() {
+                    auto pac = getComponent<PacComponent>();
+                    if (!pac->getTileMap()->isBlocked(pac->getNextTile()))
+                        time_elasped += Runtime::delta_time;
+                }
 
                 void draw() {
                     Entity::Entity::draw();
-                    Graphics::drawText({
-                        getComponent<PacComponent>()->m_position.x-4, 
-                        getComponent<PacComponent>()->m_position.y-4, 
-                        0, 0}, "E", Graphics::renderer);
+                    auto pac = getComponent<PacComponent>();
+                    SDL_Rect src = {0, 0, 16, 16};
+                    SDL_Rect dst = {
+                        pac->m_position.x-8, 
+                        pac->m_position.y-8, 16, 16};
+                    
+                    auto direction = Runtime::Pac::vfromd(pac->m_direction);
+                    auto angle = atan2(direction.y, direction.x)/(M_PI/180.0);
 
+                    // Animation
+                    int frame = ((time_elasped/Runtime::tick_length)/3) % 3;
+                    src.x += frame*16;
+
+
+                    SDL_RenderCopyEx(Graphics::renderer, pacman_texture.get(), &src, &dst, 
+                        angle, NULL, SDL_FLIP_NONE);
                 }
+
+                Graphics::shared_texture pacman_texture = nullptr;
+                Runtime::duration time_elasped = Runtime::duration::zero();
+                Runtime::Pac::PACDirection m_direction_buffer = PACDirection::LAST;
             };
+        
     }
    
 }

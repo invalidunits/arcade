@@ -17,6 +17,12 @@ find_package(SDL2 REQUIRED)
 
 
 add_executable(arcade_machine ${SRC} foo.hh) 
+target_compile_definitions(arcade_machine
+    PRIVATE
+        # If the debug configuration pass the DEBUG define to the compiler 
+        $<$<CONFIG:Debug>:DEBUG>
+)
+
 
 add_custom_command(
     OUTPUT foo.hh

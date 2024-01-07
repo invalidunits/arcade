@@ -55,7 +55,6 @@ namespace Runtime {
                 int x, y, depth;
                 auto collide = stbi_load_from_memory((stbi_uc *)ROM::gIMGmazeCollisionData, ROM::gIMGmazeCollisionSize, &x, &y, &depth, 1);
                 for (size_t i = 0; i < (x*y); i++) {
-                    std::printf("%d", (int)collide[i]);
                     switch (collide[i]) {
                         case 0:
                             pellets.push_back(PACPellet::regular);

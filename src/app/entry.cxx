@@ -13,6 +13,7 @@ using namespace Graphics;
 #include <runtime/scene/scene.hxx>
 #include <runtime/scene/implementation/mainmenu.hxx>
 #include <system/com.hxx>
+#include <system/controls.hxx>
 
 Runtime::duration accumalation = Runtime::duration::zero();
 int main(int argc, char *argv[]) {
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]) {
 
     
     COM::beginCOMThread();
+    Controls::beginControlThread();
     Runtime::SceneManager::pushScene<Runtime::MainMenu>();
 
 
@@ -47,6 +49,7 @@ int main(int argc, char *argv[]) {
         SDL_Event event = {};
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                Controls::endControlThread();
                 COM::endCOMThread();
                 return 0;
             }
