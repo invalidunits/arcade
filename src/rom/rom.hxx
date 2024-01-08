@@ -10,6 +10,7 @@ namespace ROM {
 	    INCBIN_EXTERN(IMGmainMenuCoin);
 	    INCBIN_EXTERN(IMGmainMenuStart);
         INCBIN_EXTERN(IMGmainMenuGhost);
+        INCBIN_EXTERN(IMGmainMenuCounter);
 
         INCBIN_EXTERN(IMGpacmanCutscene);
         INCBIN_EXTERN(IMGpacman);

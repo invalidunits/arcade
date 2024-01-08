@@ -2,18 +2,15 @@
 
 
 
-
-
 extern "C" {
 	INCBIN(EmuLogic, "rom/emulogic.ttf");
-
-
 
 	// Main Menu
 	INCBIN(IMGmainMenu, "rom/img/main_menu.png");
 	INCBIN(IMGmainMenuCoin, "rom/img/main_menuic.png");
 	INCBIN(IMGmainMenuStart, "rom/img/main_menupsb.png");
 	INCBIN(IMGmainMenuGhost, "rom/img/main_menug.png");
+	INCBIN(IMGmainMenuCounter, "rom/img/main_menu_counters.png");
 
 	// Pacman
 	INCBIN(IMGpacmanCutscene, "rom/img/pacman/pacman_cutscene.png");
@@ -30,4 +27,3 @@ extern "C" {
 	INCBIN(IMGghostPinky, "rom/img/ghost/pinky.png");
 	INCBIN(IMGghostClyde, "rom/img/ghost/clyde.png");	
 }
-

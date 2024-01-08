@@ -143,7 +143,7 @@ namespace Runtime {
 
             struct Blinky : Ghost {
                 Blinky() {
-                    texture = ARDCADE_LOADTEXTROM(IMGghostBlinky);
+                    texture = ARCADE_LOADTEXTROM(IMGghostBlinky);
                     registerComponent<PacComponent>();
                     registerComponent<GhostComponent>(
                         std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)),
@@ -169,7 +169,7 @@ namespace Runtime {
 
             struct Pinky : Ghost {
                 Pinky() {
-                    texture = ARDCADE_LOADTEXTROM(IMGghostPinky);
+                    texture = ARCADE_LOADTEXTROM(IMGghostPinky);
                     registerComponent<PacComponent>();
                     registerComponent<GhostComponent>(
                         std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)),
@@ -199,7 +199,7 @@ namespace Runtime {
 
 
                 Clyde() {
-                    texture = ARDCADE_LOADTEXTROM(IMGghostClyde);
+                    texture = ARCADE_LOADTEXTROM(IMGghostClyde);
                     registerComponent<PacComponent>();
                     registerComponent<GhostComponent>(
                         std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)),

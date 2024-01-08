@@ -10,6 +10,8 @@
 #include <runtime/entity/implementation/tileset.hxx>
 #include <runtime/entity/implementation/ghost.hxx>
 #include <runtime/entity/entity.hxx>
+#include <runtime/counters/counters.hxx>
+
 
 namespace Runtime {
     struct Gameplay : public Entity::EntityManager { 

@@ -112,6 +112,16 @@ namespace Math {
         return std::move(out).str();
     }
 
+    template <typename T>
+    std::string to_string_with_zero_pad(const T a_value, const int n = 6)
+    {
+        static_assert(std::is_integral_v<T>, "Type must be integeral");
+        std::stringstream out;
+        out << std::setfill('0') << std::setw(n) << std::right;
+        out << a_value;
+        return std::move(out).str();
+    }
+
 } // namespace Math
 
 

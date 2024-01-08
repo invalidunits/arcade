@@ -38,9 +38,20 @@ target_link_libraries(arcade_machine
     -lSDL2main
     -lSDL2
     -lSDL2_ttf
+
+)
+
+if (MINGW) 
+    target_link_libraries(arcade_machine
+    -lmingw32 
+    )
+endif()
+if (WIN32)
+    target_link_libraries(arcade_machine
     -lsetupapi 
     -lhid
-)
+    )
+endif()
 
 include_directories("src/")
 

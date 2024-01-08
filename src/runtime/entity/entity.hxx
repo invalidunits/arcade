@@ -73,10 +73,8 @@ namespace Runtime {
             }
 
             
-            __ENTITY__MANAGER_IUPDATE_IMPL(setup);
             __ENTITY__MANAGER_IUPDATE_IMPL(update);
             __ENTITY__MANAGER_IUPDATE_IMPL(update_fixed);
-            __ENTITY__MANAGER_IUPDATE_IMPL(cleanup);
             __ENTITY__MANAGER_IUPDATE_IMPL(draw);
 
 
@@ -87,6 +85,27 @@ namespace Runtime {
                 for (auto it = m_entities.begin(); it != m_entities.end(); it++) 
                     if (it->get()->getIdentity() == identifier) ret.push_back(it->get());
                 return ret;
+            }
+            
+            template <typename T, typename... TArgs> T *addEntity(TArgs&&... args) {
+                static_assert(std::is_base_of_v<Entity, T>, "Type must be Entity");
+                
+                
+                m_entities.push_back(std::make_unique<T>(args...));
+                auto entity = m_entities.back().get();
+                entity->m_manager = this;
+                entity->setup();
+
+                return static_cast<T*>(entity);
+            }
+            void removeEntity(Entity *entity) {
+                const auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](std::unique_ptr<Entity>& value){
+                    return value.get() == entity;
+                });
+                if (it != m_entities.end()) {
+                    entity->cleanup();
+                    m_entities.erase(it);
+                }
             }
 
             

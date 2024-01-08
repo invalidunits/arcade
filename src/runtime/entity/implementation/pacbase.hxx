@@ -9,6 +9,7 @@
 #include "tileset.hxx"
 
 #include <system/controls.hxx>
+#include <runtime/counters/counters.hxx>
 
 
 namespace Runtime {
@@ -92,7 +93,7 @@ namespace Runtime {
     
             struct PacMan : public Entity::Entity {
                 PacMan() {
-                    pacman_texture = ARDCADE_LOADTEXTROM(IMGpacman);
+                    pacman_texture = ARCADE_LOADTEXTROM(IMGpacman);
                     registerComponent<PacComponent>();
                 }
 
