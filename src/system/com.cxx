@@ -63,7 +63,13 @@ namespace COM {
         std::string com_port = "COM1";
         if (const char *cp = std::getenv("COM_PORT"))
             com_port = cp;
-        serial_port = std::unique_ptr<serial::Serial>(new serial::Serial(com_port, com_baud_rate));
+        try {
+            serial_port = std::unique_ptr<serial::Serial>(new serial::Serial(com_port, com_baud_rate));
+        } catch (...) {
+            std::printf("Failed to connect to serial port.\n No COM communication available.\n");
+            return;
+        }
+        
         if (!serial_port->isOpen()) {
             serial_port->open();
             SDL_assert(serial_port->isOpen());
@@ -76,10 +82,18 @@ namespace COM {
     }
 
     void endCOMThread(void) {
-        cancel_com = true;
-        serial_thread.join();
-        serial_port->flush();
-        serial_port->close();
-        delete serial_port.release();
+        if (serial_thread.joinable()) {
+            cancel_com = true;
+            serial_thread.join();
+        }
+
+        if (serial_port) {
+            if (serial_port->isOpen()) {
+                serial_port->flush();
+                serial_port->close();
+            }
+            
+            serial_port.reset();
+        }
     }
 } // namespace Serial
