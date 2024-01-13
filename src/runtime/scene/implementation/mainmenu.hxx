@@ -47,8 +47,9 @@ namespace Runtime {
                 int frame = Runtime::current_tick;
                 bool start_button = (Controls::button_inputs[Controls::BUTTON_A] || Controls::button_inputs[Controls::BUTTON_START]);
                 const Uint8 *key = SDL_GetKeyboardState(nullptr);
+                bool enter_coin = false;
                 #ifdef DEBUG
-                    bool enter_coin = key[SDL_SCANCODE_RIGHT] != 0; // TODO: Connect enter_coin debug param to a debug macro.
+                    enter_coin = key[SDL_SCANCODE_RIGHT] != 0; // TODO: Connect enter_coin debug param to a debug macro.
                 #endif
 
                 if (can_start() && !first_ready) {
