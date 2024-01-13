@@ -16,7 +16,7 @@ find_package(SDL2 REQUIRED)
 
 
 
-add_executable(arcade_machine ${SRC} foo.hh) 
+add_executable(arcade_machine ${SRC} ROM) 
 target_compile_definitions(arcade_machine
     PRIVATE
         # If the debug configuration pass the DEBUG define to the compiler 
@@ -25,8 +25,8 @@ target_compile_definitions(arcade_machine
 
 
 add_custom_command(
-    OUTPUT foo.hh
-    COMMAND cmake -E copy_directory_if_different "${CMAKE_CURRENT_SOURCE_DIR}/rom" "${CMAKE_BINARY_DIR}/rom"
+    OUTPUT ROM
+    COMMAND cmake -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/rom" "${CMAKE_BINARY_DIR}/rom"
 )
 
 
