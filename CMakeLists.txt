@@ -34,11 +34,9 @@ add_custom_command(
 
 
 target_link_libraries(arcade_machine
-    -lmingw32
     -lSDL2main
     -lSDL2
     -lSDL2_ttf
-
 )
 
 if (MINGW) 
