@@ -21,8 +21,6 @@ namespace Runtime {
                 PacComponent(Entity::Entity *entity): Entity::Component(entity) {}
 
                 bool atIntersection() {
-                    
-
                     auto tile = getCurrentTile();
                     if (last_tile.x == tile.x && last_tile.y == tile.y) return false;
                     auto tilemap = getTileMap();
@@ -58,6 +56,11 @@ namespace Runtime {
                 }
 
                 void update_fixed() {
+                    int val = Runtime::current_tick % inverse_speed;
+                    if (val) {
+                        return; // skip frames to account for inverse_speed.
+                    } 
+
                     last_tile = getCurrentTile();
                     if (!moving) return;
                     auto tilemap = getTileMap();
@@ -70,10 +73,12 @@ namespace Runtime {
                     } else {
                         m_position.x = (float(m_position.x/Pac::tile_size.x) + 0.5)*Pac::tile_size.x;
                     }
+
+                    m_position.x = Math::wrap_number(m_position.x, -Pac::tile_size.x, Pac::tile_size.x*(tilemap->tilemap_size.x + 1));
+                    m_position.y = Math::wrap_number(m_position.y, -Pac::tile_size.x, Pac::tile_size.y*(tilemap->tilemap_size.y + 1));
                     
                     if (tilemap->isBlocked(next_tile)) return;
-                    auto dvector = Runtime::Pac::vfromd(m_direction);
-                    m_position = m_position + dvector;
+                    m_position = m_position + Runtime::Pac::vfromd(m_direction);
 
    
         
@@ -85,7 +90,8 @@ namespace Runtime {
                 // bool canProceed();
                 movement_tile last_tile = {8, 8}; 
                 Math::pointi m_position = {8, 8}; 
-                bool moving = true ;
+                bool moving = true;
+                int inverse_speed = 1.0;
                 PACDirection m_direction = PACDirection::RIGHT;
             };
 

@@ -38,8 +38,13 @@ namespace Runtime {
                 void update_fixed() {
                     PacComponent *pac  = m_entity->getComponent<PacComponent>();
                     SDL_assert(pac != nullptr);
-                    pac->moving = true;
                     auto tilemap = pac->getTileMap();
+                    if (tilemap->slow_moving_tile[tilemap->getTileIndex(pac->getCurrentTile())]) {
+                        pac->inverse_speed = int((Runtime::current_tick % 2) == 0) + 1;
+                    }
+
+
+                    pac->moving = true;
                     state_timer -= Runtime::tick_length;
                     if (state_timer.count() < 0) {
                         switch (state) {

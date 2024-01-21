@@ -122,6 +122,18 @@ namespace Math {
         return std::move(out).str();
     }
 
+    template <typename T>
+    T wrap_number(T number, T lower, T upper) {
+        static_assert(std::is_integral_v<T>, "Type must be integeral");
+        if (number < lower) {
+            return upper - (lower - number) % (upper - lower);
+        } else if (number > upper) {
+            return lower + (number - upper) % (upper - lower);
+        } else {
+            return number;
+    }
+}
+
 } // namespace Math
 
 

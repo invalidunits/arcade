@@ -54,20 +54,21 @@ namespace Runtime {
                 int x, y, depth;
                 auto collide = stbi_load_from_memory((stbi_uc *)ROM::gIMGmazeCollisionData, ROM::gIMGmazeCollisionSize, &x, &y, &depth, 1);
                 for (size_t i = 0; i < (x*y); i++) {
-                    switch (collide[i]) {
-                        case 0:
-                            pellets.push_back(PACPellet::regular);
-                            collision.push_back(false);
-                            break;
-                        case 143:
-                            pellets.push_back(PACPellet::super);
-                            collision.push_back(false);
-                            break;
-                        case 255:
-                            pellets.push_back(PACPellet::none);
-                            collision.push_back(true);
-                            break;
+                    slow_moving_tile.push_back( collide[i] == 60);
+                    if (collide[i] == 255) collision.push_back(true), pellets.push_back(PACPellet::none); 
+
+                    else {
+                        collision.push_back(false);
+                        switch (collide[i]) {
+                            case 143:
+                                pellets.push_back(PACPellet::super); break;
+
+                            default:
+    
+                                pellets.push_back(PACPellet::regular); break;
+                        }
                     }
+                    
                 }
                 stbi_image_free(collide);
 
@@ -120,16 +121,17 @@ namespace Runtime {
                 return static_cast<Math::pointi>(tile);
             }
 
+            const int getTileIndex(movement_tile tile) const {
+                return std::abs(
+                    std::clamp(tile.x, 0, tilemap_size.x - 1)
+                ) + std::abs(
+                    std::clamp(tile.y, 0, tilemap_size.y - 1))*tilemap_size.w;
+            }
+
             const bool isBlocked(movement_tile tile) const {
-                // You're not allowed to leave the screen.
-                if (tile.x < 0 || tile.x > tilemap_size.w) return true;
-                if (tile.y < 0 || tile.y > tilemap_size.h) return true;
-                
-                int tileindex = std::abs(tile.x) + std::abs(tile.y)*tilemap_size.w;
-                if (tileindex < 0 || tileindex > collision.size()) return true;
-
-
-                return collision[tileindex];
+                int tile_index = getTileIndex(tile);
+                if (tile_index < 0 || tile_index > collision.size()) return true;
+                return collision[tile_index];
             }
 
             const std::string_view getIdentity() const { return "Tilemap"; }
@@ -139,7 +141,8 @@ namespace Runtime {
 
             Graphics::shared_texture tilemap_texture = nullptr;
             Graphics::shared_texture collectables_texture = nullptr;
-
+            
+            std::vector<bool> slow_moving_tile = {};
             std::vector<bool> collision = {};
             std::vector<PACPellet> pellets = {};     
 
