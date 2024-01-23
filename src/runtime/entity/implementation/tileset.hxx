@@ -92,7 +92,7 @@ namespace Runtime {
                             i / tilemap_size.w
                         };
 
-                        auto pos = Math::pointi(tile*tile_size);
+                        auto pos = Math::pointi(tile*tile_size) + position;
                         SDL_Rect dst = {
                             pos.x, pos.y, 8, 8
                         };

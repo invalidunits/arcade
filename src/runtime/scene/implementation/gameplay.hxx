@@ -18,9 +18,11 @@
 namespace Runtime {
     struct Gameplay : public Entity::EntityManager { 
         void setup() {
-                            addEntity<Runtime::Pac::Tilemap>();
+            auto tilemap =  addEntity<Runtime::Pac::Tilemap>();
+            tilemap->position = {0, 18};
+
             auto pacman =   addEntity<Runtime::Pac::PacMan>();
-            pacman->getComponent<Runtime::Pac::PacComponent>()->m_position = {112, 188};
+            pacman->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 188};
 
             ghosts = {
                             addEntity<Runtime::Pac::Ghost::Blinky>(),
@@ -28,14 +30,14 @@ namespace Runtime {
                             addEntity<Runtime::Pac::Ghost::Clyde>(),
             };
 
-            ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = {112, 92};
+            ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 92};
             ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>()->state = Runtime::Pac::Ghost::STATE_SCATTER;
             inactive_ghosts = ghosts;
             inactive_ghosts.erase(inactive_ghosts.begin());
 
 
-            inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = {112, 120};
-            inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = {128, 120};
+            inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 120};
+            inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{128, 120};
             // inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = {96, 120};
 
 
@@ -68,7 +70,7 @@ namespace Runtime {
 
             if (inactive_ghosts.size() > (amount/120)) {
                 if ((Runtime::current_tick % 3) != 0) goto release_yield_frame;
-                constexpr Math::pointi target_active_position = {112, 92};
+                const Math::pointi target_active_position = tilemap->position + Math::pointi{112, 92};
                 auto pac = inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>();
 
                 #define PAC_GOTO(axis, pdir, ndir) if (pac->m_position.axis != target_active_position.axis) { \
@@ -100,16 +102,16 @@ namespace Runtime {
         }
 
         void draw() {
-
+            auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
             EntityManager::draw();
             Runtime::display_coins = false;
             Runtime::drawCounter();
 
             if (flags[0]) {
-                const auto rect = SDL_Rect{80, 136, 64, 8};
+                const auto rect = SDL_Rect{tilemap->position.x + 80, tilemap->position.y + 136, 64, 8};
                 SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, 255);
                 SDL_RenderFillRect(Graphics::renderer, &rect);
-                Graphics::drawText({81, 136, 0, 0}, "Ready P1", Graphics::renderer);
+                Graphics::drawText({tilemap->position.x + 80, tilemap->position.y + 136, 0, 0}, "Ready P1", Graphics::renderer);
             }
         }
 

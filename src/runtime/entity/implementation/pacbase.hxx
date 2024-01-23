@@ -68,11 +68,14 @@ namespace Runtime {
                     auto next_tile = getNextTile();
 
                     // Clamp to grid.
+                    #define CLAMP_TO_GRID(axis) m_position.axis = (float((m_position.axis - tilemap->position.axis)/Pac::tile_size.axis) + 0.5)*Pac::tile_size.axis + tilemap->position.axis;
                     if (m_direction == PACDirection::RIGHT || m_direction == PACDirection::LEFT)  {
-                        m_position.y = (float(m_position.y/Pac::tile_size.y) + 0.5)*Pac::tile_size.y;
+                        CLAMP_TO_GRID(y);
                     } else {
-                        m_position.x = (float(m_position.x/Pac::tile_size.x) + 0.5)*Pac::tile_size.x;
+                        CLAMP_TO_GRID(x);
                     }
+
+                    #undef CLAMP_TO_GRID
 
                     m_position.x = Math::wrap_number(m_position.x, -Pac::tile_size.x, Pac::tile_size.x*(tilemap->tilemap_size.x + 1));
                     m_position.y = Math::wrap_number(m_position.y, -Pac::tile_size.x, Pac::tile_size.y*(tilemap->tilemap_size.y + 1));
