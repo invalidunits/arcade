@@ -77,7 +77,8 @@ namespace Runtime {
                     m_position.x = Math::wrap_number(m_position.x, -Pac::tile_size.x, Pac::tile_size.x*(tilemap->tilemap_size.x + 1));
                     m_position.y = Math::wrap_number(m_position.y, -Pac::tile_size.x, Pac::tile_size.y*(tilemap->tilemap_size.y + 1));
                     
-                    if (tilemap->isBlocked(next_tile)) return;
+                    if (tilemap->isBlocked(next_tile)) 
+                        return;
                     m_position = m_position + Runtime::Pac::vfromd(m_direction);
 
    
@@ -90,7 +91,7 @@ namespace Runtime {
                 // bool canProceed();
                 movement_tile last_tile = {8, 8}; 
                 Math::pointi m_position = {8, 8}; 
-                bool moving = true;
+                bool moving = false;
                 int inverse_speed = 1.0;
                 PACDirection m_direction = PACDirection::RIGHT;
             };
@@ -108,6 +109,8 @@ namespace Runtime {
                     auto pac = getComponent<PacComponent>();
                     auto x_axis_raw = Controls::axis_inputs[Controls::AXIS_X].load();
                     auto y_axis_raw = Controls::axis_inputs[Controls::AXIS_Y].load();
+
+                    pac->moving = true;
 
                     auto x_axis = std::abs(x_axis_raw) > deadzone? (0 < x_axis_raw) - (x_axis_raw < 0) : 0;
                     auto y_axis = std::abs(y_axis_raw) > deadzone? (0 < y_axis_raw) - (y_axis_raw < 0) : 0;
@@ -135,9 +138,21 @@ namespace Runtime {
                     if (tile_index < 0)
                         tile_index = 0;
 
-                    if (tile_index < tilemap->pellets.size())
-                        // Allow super pellet.
+                    if (tile_index < tilemap->pellets.size()) {
+                        switch (tilemap->pellets[tile_index])  {
+                            case Pac::PACPellet::regular:
+                                Runtime::current_score += 10; break;
+                            
+                            case Pac::PACPellet::super:
+                                Runtime::current_score += 100;
+                                //TODO: Add ghost eating
+                                break;
+    
+                        }
+
                         tilemap->pellets[tile_index] = Pac::PACPellet::none;
+                    }
+                        
                     
                 }
 

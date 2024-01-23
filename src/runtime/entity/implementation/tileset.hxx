@@ -66,6 +66,9 @@ namespace Runtime {
                             default:
     
                                 pellets.push_back(PACPellet::regular); break;
+                            
+                            case 88: 
+                                pellets.push_back(PACPellet::none);
                         }
                     }
                     

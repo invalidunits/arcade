@@ -23,6 +23,7 @@ namespace Runtime {
                 STATE_SCARED,
                 STATE_RETREAT,
                 STATE_LAST,
+                STATE_INACTIVE,
             };
 
             using movement_behavior_array = std::array<movement_behavior, STATE_LAST>;
@@ -41,6 +42,11 @@ namespace Runtime {
                     auto tilemap = pac->getTileMap();
                     if (tilemap->slow_moving_tile[tilemap->getTileIndex(pac->getCurrentTile())]) {
                         pac->inverse_speed = int((Runtime::current_tick % 2) == 0) + 1;
+                    }
+
+                    if (state == STATE_INACTIVE){
+                        pac->inverse_speed = 1;
+                        return;
                     }
 
 
@@ -92,7 +98,7 @@ namespace Runtime {
 
 
                 Runtime::duration state_timer = Runtime::duration::zero();
-                State state = State::STATE_SCARED;
+                State state = State::STATE_INACTIVE;
                 Pac::movement_tile target_tile = {0, 0};
 
                 const movement_behavior_array m_behaviors;

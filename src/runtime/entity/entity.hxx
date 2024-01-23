@@ -72,6 +72,10 @@ namespace Runtime {
                 }   \
             }
 
+            void cleanup() {
+                EntityManager::m_entities.clear();
+            }
+
             
             __ENTITY__MANAGER_IUPDATE_IMPL(update);
             __ENTITY__MANAGER_IUPDATE_IMPL(update_fixed);

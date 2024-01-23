@@ -48,10 +48,10 @@ namespace Runtime {
                                     Math::color8a(~0, ~0, ~0, ~0) : 
                                     Math::color8a(~0, ~0, 0, ~0));
 
-            if (Runtime::coin_display > 100) 
+            if (Runtime::coin_display > 1000) 
                 Graphics::drawText(coindraw, "STOP IT!",
                         Graphics::renderer, color);
-            else if (Runtime::coin_display > 500) 
+            else if (Runtime::coin_display > 8000) 
                 Graphics::drawText(coindraw, "Too much...",
                         Graphics::renderer, color);
             else Graphics::drawText(coindraw, std::string("$") + std::string(Math::to_string_with_precision(float(coin_display*coin_display_multiplier), 2)),
@@ -63,11 +63,7 @@ namespace Runtime {
         
         auto livedst = Math::recti(24, 8, 0, 0);
         Graphics::drawText(livedst, "x" + Math::to_string_with_precision(live_count, 0),
-                Graphics::renderer);
-
-        auto pointdst = Math::recti(68, 8, 0, 0);
-        Graphics::drawText(pointdst, Math::to_string_with_zero_pad(current_score, 5),
-                Graphics::renderer);
+                Graphics::renderer); 
         
         Math::color8a highcolor = Math::color8a(~0, ~0, ~0, ~0);
         if (current_score == high_score && high_score != 0) {
@@ -86,9 +82,13 @@ namespace Runtime {
             }
         }
 
+        auto pointdst = Math::recti(68, 8, 0, 0);
+        Graphics::drawText(pointdst, Math::to_string_with_zero_pad(current_score, 5),
+                Graphics::renderer, highcolor);
+
         auto highdst = Math::recti(158, 8, 0, 0);
         Graphics::drawText(highdst, Math::to_string_with_zero_pad(current_score, 5),
-                Graphics::renderer, highcolor);
+                Graphics::renderer);
             
             
 
