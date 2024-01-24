@@ -25,8 +25,6 @@ namespace Runtime {
         virtual void resume(void) {}
     };
 
-    std::map<std::string, std::any> global_variables = {}; 
-
     namespace SceneManager {
         inline std::vector<Math::UUID> scene_stack = {};
         inline std::map<Math::UUID, std::unique_ptr<Scene>> scene_map = {};   
@@ -43,7 +41,7 @@ namespace Runtime {
             return Math::getUUID<T>();
         }
 
-        Scene *getCurrentScene(void) {
+        static Scene *getCurrentScene(void) {
             if (scene_stack.empty()) {
                 registerScene<Scene>();
                 return scene_map.at(Math::getUUID<Scene>()).get(); // Return an empty scene.
@@ -52,7 +50,7 @@ namespace Runtime {
             return scene_map.at(scene_stack.back()).get(); 
         }
 
-        Math::UUID popScene(void) {
+        static Math::UUID popScene(void) {
             getCurrentScene()->cleanup();
             auto id = scene_stack.back();
             scene_stack.pop_back();

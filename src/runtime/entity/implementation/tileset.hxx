@@ -112,32 +112,32 @@ namespace Runtime {
                 
             }
 
-            const movement_tile getClosestTile(Math::pointi point) const {
+            const inline movement_tile getClosestTile(Math::pointi point) const {
                 point = point - position;
                 point = point / tile_size;
                 return static_cast<movement_tile>(point);
             }
 
-            const Math::pointi getTilePosition(movement_tile tile) const {
+            const inline Math::pointi getTilePosition(movement_tile tile) const {
                 tile = tile + position;
                 tile = tile * tile_size;
                 return static_cast<Math::pointi>(tile);
             }
 
-            const int getTileIndex(movement_tile tile) const {
+            const inline int getTileIndex(movement_tile tile) const {
                 return std::abs(
                     std::clamp(tile.x, 0, tilemap_size.x - 1)
                 ) + std::abs(
                     std::clamp(tile.y, 0, tilemap_size.y - 1))*tilemap_size.w;
             }
 
-            const bool isBlocked(movement_tile tile) const {
+            const inline bool isBlocked(movement_tile tile) const {
                 int tile_index = getTileIndex(tile);
                 if (tile_index < 0 || tile_index > collision.size()) return true;
                 return collision[tile_index];
             }
 
-            const std::string_view getIdentity() const { return "Tilemap"; }
+            const inline  std::string_view getIdentity() const { return "Tilemap"; }
 
             Math::pointi position = {};
             Math::pointi tilemap_size = {};

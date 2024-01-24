@@ -30,7 +30,7 @@ namespace Runtime {
                 return static_cast<T*>(component->second.get());
             }
 
-            const virtual std::string_view getIdentity() const { return "Undefined"; }
+            const inline virtual std::string_view getIdentity() const { return "Undefined"; }
             #define __ENTITY_IUPDATE_IMPL(func) void func () { \
                 for (const auto &component : m_components) { \
                     component.second->func();\
