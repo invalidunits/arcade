@@ -17,7 +17,7 @@
 
 namespace Runtime {
     struct Gameplay : public Entity::EntityManager { 
-        
+
         void setup();
         void update();
         void update_fixed();
@@ -25,11 +25,10 @@ namespace Runtime {
         void cleanup();
         
 
-        std::bitset<8> flags = 0;
-        bool release_ghost = true;
         std::vector<Runtime::Pac::Ghost::Ghost*> ghosts = {};
         std::vector<Runtime::Pac::Ghost::Ghost*> inactive_ghosts = {};
         Runtime::duration clock_delay = decltype(clock_delay)::zero();
+        bool game_over = false;
     };
 }
 

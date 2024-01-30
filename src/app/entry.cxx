@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     COM::beginCOMThread();
     Controls::beginControlThread();
     Runtime::setupCounter();
-    Runtime::SceneManager::pushScene<Runtime::MainMenu>();
+    Runtime::SceneManager::pushScene<Runtime::Gameplay>();
 
 
     
@@ -69,14 +69,15 @@ int main(int argc, char *argv[]) {
             Runtime::current_tick += 1;
             scene->update_fixed();
         }
-
+        
+        scene = Runtime::SceneManager::getCurrentScene();
         scene->update();
 
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderFillRect(NULL, NULL);
 
-
+        scene = Runtime::SceneManager::getCurrentScene();
         scene->draw();
         SDL_RenderPresent(renderer);
     }

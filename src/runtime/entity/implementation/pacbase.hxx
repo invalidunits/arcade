@@ -63,14 +63,18 @@ namespace Runtime {
 
                 const inline std::string_view getIdentity() const { return "PacMan"; }
                 void update_fixed();
-
                 void update();
-
                 void draw();
+
+                void killPacman();
 
                 Graphics::shared_texture pacman_texture = nullptr;
                 Runtime::duration time_elasped = Runtime::duration::zero();
                 Runtime::Pac::PACDirection m_direction_buffer = PACDirection::LAST;
+
+                protected:
+                    bool dead = false;
+                    decltype(Runtime::current_tick) dead_tick = 0;
             };
         
     }

@@ -45,7 +45,7 @@ namespace Runtime {
 
             #undef __ENTITY_IUPDATE_IMPL
 
-            const EntityManager *getManager() const { return m_manager; }
+            EntityManager *getManager() const { return m_manager; }
 
             protected:
                 friend struct EntityManager;

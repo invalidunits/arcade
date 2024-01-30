@@ -1,5 +1,5 @@
 #include "gameplay.hxx"
-
+#include "mainmenu.hxx"
 namespace Runtime {
     void Gameplay::setup() {
         auto tilemap =  addEntity<Runtime::Pac::Tilemap>();
@@ -27,8 +27,10 @@ namespace Runtime {
 
         flags[0] = 1;
         clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
-            std::chrono::seconds(10)
+            std::chrono::seconds(5)
         );
+
+        game_over = false;
     }
 
 
@@ -47,9 +49,40 @@ namespace Runtime {
             return;
         }
 
+        if (game_over) {
+            
+
+            if (Runtime::live_count <= 1) {
+                flags[6] = 1;
+                game_over = false;
+                clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
+                    std::chrono::seconds(5)
+                );
+
+                return;
+            }
+
+            live_count -= 1;
+            SceneManager::popScene();
+            SceneManager::pushScene<Gameplay>();
+        }
+
         auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
         auto amount = std::count(tilemap->pellets.begin(), tilemap->pellets.end(), Runtime::Pac::PACPellet::regular);
         
+        if (flags.test(7)) {
+            flags[7] = 0;
+            game_over = true;
+            clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
+                std::chrono::seconds(5)
+            );
+
+            return;
+        }
+
+        if (flags.test(6)) {
+            SceneManager::gotoScene<Runtime::MainMenu>();
+        }
 
 
         if (inactive_ghosts.size() > (amount/120)) {
@@ -87,7 +120,16 @@ namespace Runtime {
 
     void Gameplay::draw() {
         auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
-        EntityManager::draw();
+        
+        if (!flags[7] && !game_over)
+            EntityManager::draw();
+        else {
+            auto pacman = (Runtime::Pac::Tilemap *)getEntitysFromID("PacMan")[0];
+            // Only draw the tilemap and pacman.
+            tilemap->draw();
+            pacman->draw();
+        }
+
         Runtime::display_coins = false;
         Runtime::drawCounter();
 
@@ -96,6 +138,13 @@ namespace Runtime {
             SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, 255);
             SDL_RenderFillRect(Graphics::renderer, &rect);
             Graphics::drawText({tilemap->position.x + 80, tilemap->position.y + 136, 0, 0}, "Ready P1", Graphics::renderer);
+        }
+
+        if (flags[6]) {
+            const auto rect = SDL_Rect{tilemap->position.x + 80, tilemap->position.y + 136, 64, 8};
+            SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, 255);
+            SDL_RenderFillRect(Graphics::renderer, &rect);
+            Graphics::drawText({tilemap->position.x + 80, tilemap->position.y + 136, 0, 0}, "Game OVER", Graphics::renderer);
         }
     }
 

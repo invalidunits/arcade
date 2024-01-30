@@ -6,6 +6,7 @@
 #include <vector>
 #include <type_traits>
 #include <system/math.hxx>
+#include <bitset>
 
 #include <system/clock.hxx>
 #include <any>
@@ -18,6 +19,8 @@ namespace Runtime {
         virtual void update_fixed(void) {}
         virtual void update(void) {}
         virtual void draw(void) {}
+
+        std::bitset<8> flags = 0;
     };
 
     struct Scene : virtual public IUpdate {

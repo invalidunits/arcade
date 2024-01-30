@@ -34,8 +34,18 @@ namespace Runtime {
                             break;
                     }
                 }
-                
-                
+
+                auto pacmen = getEntity()->getManager()->getEntitysFromID("PacMan");
+
+                if (state == STATE_CHASE || state == STATE_SCATTER)
+                if (pacmen.size() > 0) {                       
+                    auto pacman = static_cast<Pac::PacMan*>(pacmen[0]);
+                    auto pacman_pac = pacman->getComponent<Pac::PacComponent>();
+                    auto dist_squared = std::pow(pacman_pac->m_position.x - pac->m_position.x, 2) + std::pow(pacman_pac->m_position.y - pac->m_position.y, 2);
+                    if (dist_squared < std::pow(4, 2)) {
+                        pacman->killPacman();
+                    }
+                }        
 
                 if (pac->atIntersection()) {
                     if (m_behaviors.at(state)) target_tile = m_behaviors[state](this);

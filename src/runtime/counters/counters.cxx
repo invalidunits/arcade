@@ -87,7 +87,7 @@ namespace Runtime {
                 Graphics::renderer, highcolor);
 
         auto highdst = Math::recti(158, 8, 0, 0);
-        Graphics::drawText(highdst, Math::to_string_with_zero_pad(current_score, 5),
+        Graphics::drawText(highdst, Math::to_string_with_zero_pad(high_score, 5),
                 Graphics::renderer);
             
             

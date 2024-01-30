@@ -9,6 +9,8 @@ namespace Runtime {
     }
 
     void MainMenu::setup() {
+        Runtime::display_coins = true;
+        Runtime::current_score = 0;
         Runtime::coin_display = 0;
     }
 

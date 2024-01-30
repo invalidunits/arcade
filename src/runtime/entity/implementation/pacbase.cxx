@@ -54,7 +54,7 @@ namespace Runtime {
             auto x_axis_raw = Controls::axis_inputs[Controls::AXIS_X].load();
             auto y_axis_raw = Controls::axis_inputs[Controls::AXIS_Y].load();
 
-            pac->moving = true;
+            pac->moving = !dead;
 
             auto x_axis = std::abs(x_axis_raw) > deadzone? (0 < x_axis_raw) - (x_axis_raw < 0) : 0;
             auto y_axis = std::abs(y_axis_raw) > deadzone? (0 < y_axis_raw) - (y_axis_raw < 0) : 0;
@@ -107,6 +107,16 @@ namespace Runtime {
                 time_elasped += Runtime::delta_time;
         }
 
+        void PacMan::killPacman() {
+            if (dead) return;
+            
+            dead = true;
+            dead_tick = Runtime::current_tick;
+            auto pac = getComponent<PacComponent>();
+            pac->moving = false;
+            getManager()->flags[7] = 1;
+        }
+
         void PacMan::draw() {
             Entity::Entity::draw();
             auto pac = getComponent<PacComponent>();
@@ -120,6 +130,14 @@ namespace Runtime {
 
             // Animation
             int frame = ((time_elasped/Runtime::tick_length)/3) % 3;
+            if (dead) {
+                auto dtick = Runtime::current_tick - dead_tick;
+                dtick -= 20;
+                dtick /= 6;
+                dtick = dtick >= 0? dtick : 0;
+                frame = dtick;
+            }
+
             src.x += frame*16;
 
 
