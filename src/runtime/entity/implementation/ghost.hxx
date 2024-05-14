@@ -26,6 +26,11 @@ namespace Runtime {
                 STATE_INACTIVE,
             };
 
+            enum TargetType {
+                TARGET_TILE,
+                TARGET_RANDOM
+            };
+
             using movement_behavior_array = std::array<movement_behavior, STATE_LAST>;
             struct GhostComponent : public Runtime::Entity::Component {
                 GhostComponent(Entity::Entity *entity,
@@ -42,6 +47,7 @@ namespace Runtime {
                 Runtime::duration state_timer = Runtime::duration::zero();
                 State state = State::STATE_INACTIVE;
                 Pac::movement_tile target_tile = {0, 0};
+                TargetType target_type = TARGET_TILE;
 
                 const movement_behavior_array m_behaviors;
                 const Runtime::duration m_scatter_time;
@@ -52,6 +58,7 @@ namespace Runtime {
 
             struct Ghost : Entity::Entity {
                 void draw();
+                const inline std::vector<std::string_view> getGroups() const {return {"Ghost"}; }
                 Graphics::shared_texture texture;
             };
 

@@ -37,6 +37,8 @@ namespace Runtime {
                 }   \
             }
 
+            const inline virtual std::vector<std::string_view> getGroups() const { return {}; }
+
             __ENTITY_IUPDATE_IMPL(setup);
             __ENTITY_IUPDATE_IMPL(update);
             __ENTITY_IUPDATE_IMPL(update_fixed);
@@ -91,6 +93,18 @@ namespace Runtime {
                 return ret;
             }
             
+            std::vector<Entity *> getEntitysFromGroups(std::string_view identifier) const {
+                std::vector<Entity *> ret = {};
+                for (auto it = m_entities.begin(); it != m_entities.end(); it++)  {
+                    auto groups = it->get()->getGroups();
+                    if(std::find(groups.begin(), groups.end(), identifier) != groups.end()) 
+                        ret.push_back(it->get());
+                }
+                return ret;
+            }
+            
+            
+
             template <typename T, typename... TArgs> T *addEntity(TArgs&&... args) {
                 static_assert(std::is_base_of_v<Entity, T>, "Type must be Entity");
                 

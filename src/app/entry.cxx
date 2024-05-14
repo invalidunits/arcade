@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     COM::beginCOMThread();
     Controls::beginControlThread();
     Runtime::setupCounter();
-    Runtime::SceneManager::pushScene<Runtime::Gameplay>();
+    Runtime::SceneManager::pushScene<Runtime::MainMenu>();
 
 
     

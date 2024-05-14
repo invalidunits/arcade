@@ -29,6 +29,7 @@ namespace Runtime {
                         
                         case STATE_SCATTER:
                             state = STATE_CHASE;
+                            target_type = TARGET_TILE;
                             pac->m_direction = dfromv(Math::pointi{0, 0}-vfromd(pac->m_direction));
                             state_timer = m_chase_time;
                             break;
@@ -37,13 +38,16 @@ namespace Runtime {
 
                 auto pacmen = getEntity()->getManager()->getEntitysFromID("PacMan");
 
-                if (state == STATE_CHASE || state == STATE_SCATTER)
+                
                 if (pacmen.size() > 0) {                       
                     auto pacman = static_cast<Pac::PacMan*>(pacmen[0]);
                     auto pacman_pac = pacman->getComponent<Pac::PacComponent>();
                     auto dist_squared = std::pow(pacman_pac->m_position.x - pac->m_position.x, 2) + std::pow(pacman_pac->m_position.y - pac->m_position.y, 2);
                     if (dist_squared < std::pow(4, 2)) {
-                        pacman->killPacman();
+                        if (state == STATE_CHASE || state == STATE_SCATTER)
+                            pacman->killPacman();
+                        else if (state == STATE_SCARED)
+                            state = STATE_RETREAT;
                     }
                 }        
 
@@ -56,17 +60,35 @@ namespace Runtime {
                     PACDirection direction = (PACDirection)pac->m_direction;
                         
                     unsigned int priority = ~0;
+
+                    PACDirection x = (PACDirection)(std::rand() % (int) PACDirection::LAST);
                     for (unsigned char i = 0; i < (int)PACDirection::LAST; i++) {
                         direction = (PACDirection)i;
                         if (direction == opposing_direction) continue; // Ghosts never backtrack.
                         if (tilemap->isBlocked(vfromd(direction) + tile)) continue; // Ghosts go where they can move.
 
-                        auto displacement = (vfromd(direction) + tile) - target_tile;
-                        auto distance = displacement.x*displacement.x + displacement.y*displacement.y; 
+                        switch (target_type) {
+                            case TARGET_RANDOM:
+                            {
+                                int p = (unsigned int)x - i;
+                                if (p < priority) {
+                                    priority = p;
+                                    pac->m_direction = direction;
+                                }
+                            }
+                                break;
+                            
+                            default:
+                            case TARGET_TILE:
+                                auto displacement = (vfromd(direction) + tile) - target_tile;
+                                auto distance = displacement.x*displacement.x + displacement.y*displacement.y; 
 
-                        if (distance <= priority) {
-                            pac->m_direction = direction;
-                            priority = distance;
+                                if (distance <= priority) {
+                                    pac->m_direction = direction;
+                                    priority = distance;
+                                }
+
+                                break;
                         }
                     }
                 }
@@ -78,6 +100,9 @@ namespace Runtime {
                 GhostComponent *ghost = getComponent<GhostComponent>();
 
                 // Body
+
+
+
                 int ghostframe = Runtime::current_tick/6;
                 SDL_Rect src = {ghost_width*(ghostframe % 2), 0, ghost_width, ghost_height};
                 
@@ -86,7 +111,10 @@ namespace Runtime {
             
                 
                 SDL_Rect dst = {pac->m_position.x - ghost_width/2, pac->m_position.y - ghost_height/2, ghost_width, ghost_height};
-                SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
+                if (ghost->state != STATE_RETREAT) 
+                    SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
+
+                dontrenderbody:
 
                 if (ghost->state != STATE_SCARED) {  
                     int eyeframe = 0;
@@ -109,5 +137,15 @@ namespace Runtime {
                 }
             }
         }
+    }
+}
+
+void ateSuper(Runtime::Entity::EntityManager *manager) {
+    for (auto&& entity : manager->getEntitysFromGroups("Ghost")) {
+        Runtime::Pac::Ghost::GhostComponent *ghost = entity->getComponent<Runtime::Pac::Ghost::GhostComponent>();
+        if (ghost->state == Runtime::Pac::Ghost::STATE_INACTIVE) continue;
+
+        ghost->state = Runtime::Pac::Ghost::STATE_SCARED;
+        ghost->target_type = Runtime::Pac::Ghost::TARGET_RANDOM;
     }
 }

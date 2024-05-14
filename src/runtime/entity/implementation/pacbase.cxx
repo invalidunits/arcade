@@ -1,6 +1,8 @@
 #include "pacbase.hxx"
 
 
+void ateSuper(Runtime::Entity::EntityManager *manager);
+
 namespace Runtime {
     namespace Pac {
         bool PacComponent::atIntersection() {
@@ -90,6 +92,7 @@ namespace Runtime {
                     case Pac::PACPellet::super:
                         Runtime::current_score += 100;
                         //TODO: Add ghost eating
+                        ateSuper(getManager());
                         break;
 
                 }
