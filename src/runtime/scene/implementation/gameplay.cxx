@@ -27,7 +27,7 @@ namespace Runtime {
 
         flags[0] = 1;
         clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
-            std::chrono::seconds(5)
+            std::chrono::seconds(3)
         );
 
         game_over = false;
@@ -35,11 +35,14 @@ namespace Runtime {
 
 
     void Gameplay::update() {
+        if (Controls::button_inputs[Controls::BUTTON_A]) 
+            clock_delay = decltype(clock_delay)::zero();
+
         if (clock_delay.count() > 0) {
             clock_delay -= Runtime::delta_time;
             return;
         }
-        
+
         flags[0] = 0;
         EntityManager::update();
     }
@@ -50,8 +53,6 @@ namespace Runtime {
         }
 
         if (game_over) {
-            
-
             if (Runtime::live_count <= 1) {
                 flags[6] = 1;
                 game_over = false;
