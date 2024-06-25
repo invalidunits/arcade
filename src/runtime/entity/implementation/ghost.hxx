@@ -30,6 +30,10 @@ namespace Runtime {
                 TARGET_TILE,
                 TARGET_RANDOM
             };
+            
+            movement_tile scaredBehavior(GhostComponent *ghostcomponent);
+            movement_tile retreatBehavior(GhostComponent *ghostcomponent);
+
 
             using movement_behavior_array = std::array<movement_behavior, STATE_LAST>;
             struct GhostComponent : public Runtime::Entity::Component {
@@ -84,7 +88,9 @@ namespace Runtime {
                                     return pacmen[0]->getComponent<PacComponent>()->getCurrentTile();
                                 }
                                 return movement_tile{0, 0};
-                            }
+                            },
+                            scaredBehavior,
+                            retreatBehavior
                         }
                     );
                 }
@@ -111,7 +117,9 @@ namespace Runtime {
                                     return pac->getCurrentTile() + vfromd(pac->m_direction)*5;
                                 }
                                 return movement_tile{0, 0};
-                            }
+                            },
+                            scaredBehavior,
+                            retreatBehavior
                         }
                     );
                 }
@@ -146,7 +154,9 @@ namespace Runtime {
                                         return pac->getCurrentTile();
                                 }
                                 return (movement_tile)tilemap->tilemap_size/2;
-                            }
+                            },
+                            scaredBehavior,
+                            retreatBehavior
                         }
                     );
                 }
