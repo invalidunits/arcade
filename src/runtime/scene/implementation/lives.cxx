@@ -1,5 +1,7 @@
 #include "lives.hxx"
 
+#include <sfx/sfx.hxx>
+
 namespace Runtime {
     LiveCutscene::LiveCutscene() {
         pacmen_cutscene =  ARCADE_LOADTEXTROM(IMGpacmanCutscene);
@@ -7,6 +9,7 @@ namespace Runtime {
     }
 
     void LiveCutscene::setup() {
+
         Runtime::display_coins = false;
         Runtime::Entity::EntityManager::setup();
         Runtime::current_score = 0;
@@ -14,6 +17,9 @@ namespace Runtime {
         live_count = coin_display/life_value;
         int next_special_char = 4;
         m_state = 0;
+
+        
+        Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSoundMS(-1, live_count*500 + 5000);
         for (int i = 0; i < live_count; i++) {
             std::srand(std::chrono::high_resolution_clock::now().time_since_epoch().count());
             pacmen.push_back(pac_t());

@@ -15,11 +15,14 @@ using namespace Graphics;
 #include <system/com.hxx>
 #include <system/controls.hxx>
 
+#include <sfx/sfx.hxx>
+
 Runtime::duration accumalation = Runtime::duration::zero();
 int main(int argc, char *argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     TTF_Init();
-    
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+
     int err = SDL_CreateWindowAndRenderer(ARCADE_WINDOW_WIDTH, ARCADE_WINDOW_HEIGHT, ARCADE_WINDOW_PROPERTIES,
         &window, &renderer);
 
@@ -44,6 +47,19 @@ int main(int argc, char *argv[]) {
     Runtime::SceneManager::pushScene<Runtime::MainMenu>();
 
 
+    Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::InitializeSFX(ROM::gSFXBeginSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXChompData>::InitializeSFX(ROM::gSFXChompSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXDeathData>::InitializeSFX(ROM::gSFXDeathSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXeatFruitData>::InitializeSFX(ROM::gSFXeatFruitSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::InitializeSFX(ROM::gSFXeatGhostSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXextraPacData>::InitializeSFX(ROM::gSFXextraPacSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::InitializeSFX(ROM::gSFXIntermissionSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXYooHOOData>::InitializeSFX(ROM::gSFXYooHOOSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXSirin1Data>::InitializeSFX(ROM::gSFXSirin1Size);
+    Runtime::Sound::SoundEffect<ROM::gSFXSirin2Data>::InitializeSFX(ROM::gSFXSirin2Size);
+    Runtime::Sound::SoundEffect<ROM::gSFXSirin3Data>::InitializeSFX(ROM::gSFXSirin3Size);
+    Runtime::Sound::SoundEffect<ROM::gSFXSirin4Data>::InitializeSFX(ROM::gSFXSirin4Size);
+    Runtime::Sound::SoundEffect<ROM::gSFXSirin5Data>::InitializeSFX(ROM::gSFXSirin5Size);
     
     for (;;) {
 

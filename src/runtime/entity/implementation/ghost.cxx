@@ -136,9 +136,19 @@ namespace Runtime {
                     SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
                 }
             }
+            movement_tile scaredBehavior(Runtime::Pac::Ghost::GhostComponent *ghostcomponent) {
+                auto pac = ghostcomponent->getEntity()->getComponent<Runtime::Pac::PacComponent>();
+
+                return {0, 0};
+            }
+            movement_tile retreatBehavior(Runtime::Pac::Ghost::GhostComponent *ghostcomponent) {
+                return {0, 0};
+            }
         }
     }
 }
+
+
 
 void ateSuper(Runtime::Entity::EntityManager *manager) {
     for (auto&& entity : manager->getEntitysFromGroups("Ghost")) {

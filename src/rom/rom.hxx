@@ -23,6 +23,21 @@ namespace ROM {
 	    INCBIN_EXTERN(IMGghostBlinky);
 	    INCBIN_EXTERN(IMGghostPinky);
 	    INCBIN_EXTERN(IMGghostClyde);  
+
+        
+        INCBIN_EXTERN(SFXBegin);
+        INCBIN_EXTERN(SFXChomp);
+        INCBIN_EXTERN(SFXDeath);
+        INCBIN_EXTERN(SFXeatFruit);
+        INCBIN_EXTERN(SFXeatGhost);
+        INCBIN_EXTERN(SFXextraPac);
+        INCBIN_EXTERN(SFXIntermission);
+        INCBIN_EXTERN(SFXYooHOO);
+        INCBIN_EXTERN(SFXSirin1);
+        INCBIN_EXTERN(SFXSirin2);
+        INCBIN_EXTERN(SFXSirin3);
+        INCBIN_EXTERN(SFXSirin4);
+        INCBIN_EXTERN(SFXSirin5);
     }
 }
 
