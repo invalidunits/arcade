@@ -1,7 +1,12 @@
 #include "gameplay.hxx"
 #include "mainmenu.hxx"
+
+#include <sfx/sfx.hxx>
+
 namespace Runtime {
     void Gameplay::setup() {
+        
+        Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::StartSound();
         auto tilemap =  addEntity<Runtime::Pac::Tilemap>();
         tilemap->position = {0, 18};
 
@@ -27,7 +32,7 @@ namespace Runtime {
 
         flags[0] = 1;
         clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
-            std::chrono::seconds(3)
+            std::chrono::seconds(5)
         );
 
         game_over = false;

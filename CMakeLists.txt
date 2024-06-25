@@ -10,6 +10,7 @@ file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}src/crom)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 file(GLOB_RECURSE SRC "src/*.cxx" "src/*.hxx" "src/*.h" "src/*.c" "src/*.cc")
 find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 
 
@@ -40,6 +41,7 @@ if (MSYS OR MINGW)
 target_link_libraries(arcade_machine
     -lSDL2main
     -lSDL2
+    -lSDL2_mixer
     -lSDL2_ttf
 )
 

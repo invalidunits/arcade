@@ -26,4 +26,20 @@ extern "C" {
 	INCBIN(IMGghostInky, "rom/img/ghost/inky.png");
 	INCBIN(IMGghostPinky, "rom/img/ghost/pinky.png");
 	INCBIN(IMGghostClyde, "rom/img/ghost/clyde.png");	
+
+	// Sound Effects 
+
+	INCBIN(SFXBegin, "rom/sfx/pacman_beginning.wav");
+	INCBIN(SFXChomp, "rom/sfx/pacman_chomp.wav");
+	INCBIN(SFXDeath, "rom/sfx/pacman_death.wav");
+	INCBIN(SFXeatFruit, "rom/sfx/pacman_eatfruit.wav");
+	INCBIN(SFXeatGhost, "rom/sfx/pacman_eatghost.wav");
+	INCBIN(SFXextraPac, "rom/sfx/pacman_extrapac.wav");
+	INCBIN(SFXIntermission, "rom/sfx/pacman_intermission.wav");
+	INCBIN(SFXYooHOO, "rom/sfx/pacman_yoohoo.wav");
+	INCBIN(SFXSirin1, "rom/sfx/siren_1.wav");
+	INCBIN(SFXSirin2, "rom/sfx/siren_2.wav");
+	INCBIN(SFXSirin3, "rom/sfx/siren_3.wav");
+	INCBIN(SFXSirin4, "rom/sfx/siren_4.wav");
+	INCBIN(SFXSirin5, "rom/sfx/siren_5.wav");
 }
