@@ -67,7 +67,10 @@ namespace Runtime {
 
 
         struct EntityManager: virtual public Scene {
-            #define __ENTITY__MANAGER_IUPDATE_IMPL(func) void func () { \
+            #define __ENTITY__MANAGER_IUPDATE_IMPL(func, customimpl) void func () { \
+                \
+                customimpl\
+                \
                 for (const auto &entity : m_entities) { \
                     entity->m_manager = this; \
                     entity->func();\
@@ -79,9 +82,14 @@ namespace Runtime {
             }
 
             
-            __ENTITY__MANAGER_IUPDATE_IMPL(update);
-            __ENTITY__MANAGER_IUPDATE_IMPL(update_fixed);
-            __ENTITY__MANAGER_IUPDATE_IMPL(draw);
+            __ENTITY__MANAGER_IUPDATE_IMPL(update, 
+                if (entity_delay.count() > 0) entity_delay -= Runtime::delta_time;
+                if (entity_delay.count() > 0) return;
+            );
+            __ENTITY__MANAGER_IUPDATE_IMPL(update_fixed,
+                if (entity_delay.count() > 0) return;
+                );
+            __ENTITY__MANAGER_IUPDATE_IMPL(draw,);
 
 
             #undef __ENTITY__MANAGER_IUPDATE_IMPL
@@ -126,8 +134,14 @@ namespace Runtime {
                 }
             }
 
+
+            void addEntityDelay(Runtime::duration delay) { 
+                if (entity_delay.count() < 0) entity_delay = delay;
+                else entity_delay += delay;     
+            }
             
             protected:
+                Runtime::duration entity_delay = decltype(entity_delay)::zero();
                 std::vector<std::unique_ptr<Entity>> m_entities = {};
         };
     }

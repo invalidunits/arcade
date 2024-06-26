@@ -21,6 +21,7 @@ namespace Runtime {
         virtual void draw(void) {}
 
         std::bitset<8> flags = 0;
+        Runtime::duration clock_delay = decltype(clock_delay)::zero();
     };
 
     struct Scene : virtual public IUpdate {

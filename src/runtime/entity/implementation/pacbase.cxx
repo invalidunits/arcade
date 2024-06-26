@@ -3,29 +3,47 @@
 
 void ateSuper(Runtime::Entity::EntityManager *manager);
 
+#include <sfx/sfx.hxx>
+#include <rom/rom.hxx>
+
 namespace Runtime {
     namespace Pac {
         bool PacComponent::atIntersection() {
             auto tile = getCurrentTile();
-            if (last_tile.x == tile.x && last_tile.y == tile.y) return false;
             auto tilemap = getTileMap();
+
+
+            auto tile_dir = dfromv(tilemap->getTilePosition(tile) - m_position);
+            
+            if(tile_dir != m_direction) 
+                return false;
+            
+
+
+
             unsigned char path_count = 0;
 
             for (unsigned char i = 0; i < (unsigned char)PACDirection::LAST; i++) {
                 PACDirection direction = (PACDirection)i;
                 if (tilemap->isBlocked(vfromd(direction) + tile)) continue;
+                auto opposingdir = dfromv(Math::pointi{0, 0}-vfromd(m_direction));
+                if (direction == opposingdir) continue;
+
                 path_count += 1;
             }
-            return path_count > 1; 
+            return path_count > 0; 
         }
 
         void PacComponent::update_fixed() {
+
+
+            last_tile = getCurrentTile();
             int val = Runtime::current_tick % inverse_speed;
             if (val) {
                 return; // skip frames to account for inverse_speed.
             } 
 
-            last_tile = getCurrentTile();
+            
             if (!moving) return;
             auto tilemap = getTileMap();
             SDL_assert(tilemap != nullptr);
@@ -84,10 +102,13 @@ namespace Runtime {
             if (tile_index < 0)
                 tile_index = 0;
 
+
             if (tile_index < tilemap->pellets.size()) {
                 switch (tilemap->pellets[tile_index])  {
                     case Pac::PACPellet::regular:
-                        Runtime::current_score += 10; break;
+                        Runtime::current_score += 10; 
+                        Runtime::Sound::SoundEffect<ROM::gSFXChompData>::StartSound();
+                        break;
                     
                     case Pac::PACPellet::super:
                         Runtime::current_score += 100;
@@ -113,6 +134,8 @@ namespace Runtime {
         void PacMan::killPacman() {
             if (dead) return;
             
+            Runtime::Sound::SoundEffect<ROM::gSFXDeathData>::StartSound();
+
             dead = true;
             dead_tick = Runtime::current_tick;
             auto pac = getComponent<PacComponent>();

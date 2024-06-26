@@ -1,4 +1,5 @@
 #include "ghost.hxx"
+#include <sfx/sfx.hxx>
 
 namespace Runtime {
     namespace Pac {
@@ -29,7 +30,6 @@ namespace Runtime {
                         
                         case STATE_SCATTER:
                             state = STATE_CHASE;
-                            target_type = TARGET_TILE;
                             pac->m_direction = dfromv(Math::pointi{0, 0}-vfromd(pac->m_direction));
                             state_timer = m_chase_time;
                             break;
@@ -46,8 +46,12 @@ namespace Runtime {
                     if (dist_squared < std::pow(4, 2)) {
                         if (state == STATE_CHASE || state == STATE_SCATTER)
                             pacman->killPacman();
-                        else if (state == STATE_SCARED)
+                        else if (state == STATE_SCARED) {
+                            Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::StartSound();
+                            getEntity()->getManager()->addEntityDelay(Runtime::tick_length*20);
                             state = STATE_RETREAT;
+                        }
+                            
                     }
                 }        
 
@@ -60,26 +64,12 @@ namespace Runtime {
                     PACDirection direction = (PACDirection)pac->m_direction;
                         
                     unsigned int priority = ~0;
-
-                    PACDirection x = (PACDirection)(std::rand() % (int) PACDirection::LAST);
                     for (unsigned char i = 0; i < (int)PACDirection::LAST; i++) {
                         direction = (PACDirection)i;
                         if (direction == opposing_direction) continue; // Ghosts never backtrack.
                         if (tilemap->isBlocked(vfromd(direction) + tile)) continue; // Ghosts go where they can move.
 
-                        switch (target_type) {
-                            case TARGET_RANDOM:
-                            {
-                                int p = (unsigned int)x - i;
-                                if (p < priority) {
-                                    priority = p;
-                                    pac->m_direction = direction;
-                                }
-                            }
-                                break;
-                            
-                            default:
-                            case TARGET_TILE:
+
                                 auto displacement = (vfromd(direction) + tile) - target_tile;
                                 auto distance = displacement.x*displacement.x + displacement.y*displacement.y; 
 
@@ -88,11 +78,9 @@ namespace Runtime {
                                     priority = distance;
                                 }
 
-                                break;
                         }
-                    }
-                }
 
+                }
             }
 
             void Ghost::draw() {
@@ -136,12 +124,16 @@ namespace Runtime {
                     SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
                 }
             }
-            movement_tile scaredBehavior(Runtime::Pac::Ghost::GhostComponent *ghostcomponent) {
-                auto pac = ghostcomponent->getEntity()->getComponent<Runtime::Pac::PacComponent>();
-
+            movement_tile scaredBehavior(Runtime::Pac::Ghost::GhostComponent *comp) {
+                auto pac = comp->getEntity()->getComponent<Runtime::Pac::PacComponent>();
+                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
+                if (pacmen.size() > 0) {  
+                    auto pacman = pacmen[0]->getComponent<Runtime::Pac::PacComponent>();
+                    return pacman->getTileMap()->tilemap_size - pacman->getCurrentTile(); 
+                } 
                 return {0, 0};
             }
-            movement_tile retreatBehavior(Runtime::Pac::Ghost::GhostComponent *ghostcomponent) {
+            movement_tile retreatBehavior(Runtime::Pac::Ghost::GhostComponent *comp) {
                 return {0, 0};
             }
         }
@@ -151,11 +143,12 @@ namespace Runtime {
 
 
 void ateSuper(Runtime::Entity::EntityManager *manager) {
+    manager->addEntityDelay(Runtime::tick_length*20);
+    Runtime::Sound::SoundEffect<ROM::gSFXeatFruitData>::StartSound();
     for (auto&& entity : manager->getEntitysFromGroups("Ghost")) {
         Runtime::Pac::Ghost::GhostComponent *ghost = entity->getComponent<Runtime::Pac::Ghost::GhostComponent>();
         if (ghost->state == Runtime::Pac::Ghost::STATE_INACTIVE) continue;
 
         ghost->state = Runtime::Pac::Ghost::STATE_SCARED;
-        ghost->target_type = Runtime::Pac::Ghost::TARGET_RANDOM;
     }
 }

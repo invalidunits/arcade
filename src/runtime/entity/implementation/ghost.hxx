@@ -25,11 +25,6 @@ namespace Runtime {
                 STATE_LAST,
                 STATE_INACTIVE,
             };
-
-            enum TargetType {
-                TARGET_TILE,
-                TARGET_RANDOM
-            };
             
             movement_tile scaredBehavior(GhostComponent *ghostcomponent);
             movement_tile retreatBehavior(GhostComponent *ghostcomponent);
@@ -51,11 +46,13 @@ namespace Runtime {
                 Runtime::duration state_timer = Runtime::duration::zero();
                 State state = State::STATE_INACTIVE;
                 Pac::movement_tile target_tile = {0, 0};
-                TargetType target_type = TARGET_TILE;
 
                 const movement_behavior_array m_behaviors;
                 const Runtime::duration m_scatter_time;
                 const Runtime::duration m_chase_time;
+
+                Runtime::duration block_time =  10*Runtime::tick_length;
+                Runtime::duration block_timer = block_time;
             };
 
             constexpr int ghost_width = 16, ghost_height = 16;
@@ -77,12 +74,14 @@ namespace Runtime {
                         std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(30)),
                         movement_behavior_array{
                             // Scatter
-                            [](GhostComponent *comp) { 
+                            [](GhostComponent *comp) {
+                                
                                 return movement_tile{0, 0};
                             },
 
                             // Chase
                             [](GhostComponent *comp) { 
+        
                                 auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
                                 if (pacmen.size() > 0) {   
                                     return pacmen[0]->getComponent<PacComponent>()->getCurrentTile();
@@ -106,11 +105,13 @@ namespace Runtime {
                         movement_behavior_array{
                             // Scatter
                             [](GhostComponent *comp) { 
+                                
                                 return movement_tile{ARCADE_LOGIC_WIDTH/tile_size.w, 0};
                             },
 
                             // Chase
                             [](GhostComponent *comp) { 
+                                
                                 auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
                                 if (pacmen.size() > 0) {   
                                     auto pac = pacmen[0]->getComponent<PacComponent>();
@@ -138,11 +139,13 @@ namespace Runtime {
                         movement_behavior_array{
                             // Scatter
                             [](GhostComponent *comp) { 
+                                
                                 return movement_tile{0, ARCADE_LOGIC_HEIGHT/tile_size.h};
                             },
 
                             // Chase
                             [](GhostComponent *comp) { 
+                                
                                 auto my_pac = comp->getEntity()->getComponent<PacComponent>();
                                 auto tilemap = my_pac->getTileMap();
                                 auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");

@@ -19,7 +19,7 @@ namespace Runtime {
         m_state = 0;
 
         
-        Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSoundMS(-1, live_count*500 + 5000);
+        Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSoundMS((live_count/10) + 1);
         for (int i = 0; i < live_count; i++) {
             std::srand(std::chrono::high_resolution_clock::now().time_since_epoch().count());
             pacmen.push_back(pac_t());

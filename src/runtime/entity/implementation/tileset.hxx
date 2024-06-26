@@ -113,14 +113,14 @@ namespace Runtime {
             }
 
             const inline movement_tile getClosestTile(Math::pointi point) const {
-                point = point - position;
+                point = (point) - position;
                 point = point / tile_size;
                 return static_cast<movement_tile>(point);
             }
 
             const inline Math::pointi getTilePosition(movement_tile tile) const {
-                tile = tile + position;
                 tile = tile * tile_size;
+                tile = tile + position + tile_size/2;
                 return static_cast<Math::pointi>(tile);
             }
 
