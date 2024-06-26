@@ -33,17 +33,17 @@ add_custom_command(
 
 
 
-
-if (MSYS OR MINGW) 
-    target_link_libraries(arcade_machine
-    -lmingw32 
-    )
 target_link_libraries(arcade_machine
     -lSDL2main
     -lSDL2
     -lSDL2_mixer
     -lSDL2_ttf
 )
+
+if (MSYS OR MINGW) 
+    target_link_libraries(arcade_machine
+    -lmingw32 
+    )
 
 endif()
 if (WIN32)
