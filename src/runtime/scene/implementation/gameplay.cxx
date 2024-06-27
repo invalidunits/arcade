@@ -2,6 +2,9 @@
 #include "mainmenu.hxx"
 
 #include <sfx/sfx.hxx>
+#include <optional>
+
+std::optional<std::vector<Runtime::Pac::PACPellet>> save_pellets = {}; 
 
 namespace Runtime {
     void Gameplay::setup() {
@@ -12,6 +15,9 @@ namespace Runtime {
 
         auto pacman =   addEntity<Runtime::Pac::PacMan>();
         pacman->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 188};
+
+        tilemap->pellets = save_pellets.value_or(tilemap->pellets);
+        save_pellets = {};
 
         ghosts = {
                         addEntity<Runtime::Pac::Ghost::Blinky>(),
@@ -28,8 +34,7 @@ namespace Runtime {
         inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 120};
         inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{128, 120};
         // inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = {96, 120};
-
-
+        
         flags[0] = 1;
         clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
             std::chrono::seconds(5)
@@ -57,6 +62,9 @@ namespace Runtime {
             return;
         }
 
+        auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
+        auto amount = std::count(tilemap->pellets.begin(), tilemap->pellets.end(), Runtime::Pac::PACPellet::regular);
+
         if (game_over) {
             if (Runtime::live_count <= 1) {
                 flags[6] = 1;
@@ -67,15 +75,44 @@ namespace Runtime {
 
                 return;
             }
-
+            save_pellets = tilemap->pellets;
             live_count -= 1;
             SceneManager::popScene();
             SceneManager::pushScene<Gameplay>();
         }
 
-        auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
-        auto amount = std::count(tilemap->pellets.begin(), tilemap->pellets.end(), Runtime::Pac::PACPellet::regular);
         
+        
+
+        if (flags[4]) {
+            Runtime::current_score += 1000;
+            flags = 0;
+            SceneManager::popScene();
+            SceneManager::pushScene<Gameplay>();
+            return;
+        }
+
+        if (flags[5]) {
+            flags.set(4);
+            Runtime::Sound::SoundEffect<ROM::gSFXYooHOOData>::StartSound(1);
+            clock_delay = std::chrono::seconds(10);
+            return;
+        }
+
+
+        if (amount <= 0) {
+            flags.set(5);
+            clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
+                std::chrono::seconds(3)
+            );
+            return;
+        }
+
+        
+        
+
+
+
         if (flags.test(7)) {
             flags[7] = 0;
             game_over = true;
