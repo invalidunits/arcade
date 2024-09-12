@@ -109,16 +109,25 @@ int main(int argc, char *argv[]) {
                 height = ARCADE_WINDOW_WIDTH;
                 width = ARCADE_WINDOW_HEIGHT;
         }
+        
+
         SDL_SetWindowSize(window, width, height);
 
 
         SDL_Event event = {};
         if (SDL_PollEvent(&event)) {
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_L) {
+                    current_orientation = orientation((int)(current_orientation + 1) % int(orientation_last));
+                }
+            }
+
             if (event.type == SDL_QUIT) {
                 Controls::endControlThread();
                 COM::endCOMThread();
                 return 0;
             }
+
         }
 
         auto scene = Runtime::SceneManager::getCurrentScene();

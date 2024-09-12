@@ -8,7 +8,7 @@
 void err(std::string_view error_message, ...);
 
 struct sdl_exception: public std::exception {
-    const char* what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW {
+    const char* what() const _NOEXCEPT {
         return SDL_GetError();
     }
 };

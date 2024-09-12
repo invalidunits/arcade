@@ -50,7 +50,10 @@ namespace Graphics {
     std::map<std::pair<void *, std::size_t>, shared_texture::weak_type> texture_cache;
     std::map<std::pair<void *, std::size_t>, shared_surface::weak_type> surface_cache; 
 
-    shared_surface loadSurface(void *data, std::size_t size) {
+    shared_surface loadSurface(void *data, std::size_t size, const char *debug_identidy) {
+        if (debug_identidy)
+            printf("Attempting to load %s...\n", debug_identidy);
+
         if (surface_cache.find({data, size}) != surface_cache.end()) {
             if (auto ret = surface_cache[{data, size}].lock())
                 return ret;
@@ -62,19 +65,22 @@ namespace Graphics {
         auto rgba = stbi_load_from_memory(reinterpret_cast<const stbi_uc*>(data), (int)size, &dimentions.w, &dimentions.h, &depth, STBI_rgb_alpha);
         if (rgba == nullptr) throw std::invalid_argument("data");
         auto surface = SDL_CreateRGBSurfaceWithFormat(0, dimentions.w, dimentions.h, 32, SDL_PIXELFORMAT_RGBA32);
+        if (!surface) throw sdl_exception();
         SDL_LockSurface(surface);
         std::memcpy(surface->pixels, rgba, dimentions.w*dimentions.h*4);
         SDL_UnlockSurface(surface);
 
 
         stbi_image_free(rgba);
-        if (!surface) throw sdl_exception();
         auto ret = std::shared_ptr<SDL_Surface>(surface, sdl_deleter());
         surface_cache.insert_or_assign({data, size}, ret);
+
+        if (debug_identidy)
+            printf("Suceccefully loaded %s!\n", debug_identidy);
         return ret;
     }
 
-    shared_texture loadTexture(void *data, std::size_t size) {
+    shared_texture loadTexture(void *data, std::size_t size, const char *debug_identidy) {
         if (texture_cache.find({data, size}) != texture_cache.end()) {
             if (auto ret = texture_cache[{data, size}].lock())
                 return ret;
@@ -83,7 +89,7 @@ namespace Graphics {
 
         Math::pointi dimentions;
 
-        shared_surface surf = loadSurface(data, size);
+        shared_surface surf = loadSurface(data, size, debug_identidy);
         auto texture = SDL_CreateTextureFromSurface(Graphics::renderer, surf.get());
         auto ret = std::shared_ptr<SDL_Texture>(texture, sdl_deleter());
         texture_cache.insert_or_assign({data, size}, ret);
