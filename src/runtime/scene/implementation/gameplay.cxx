@@ -22,6 +22,7 @@ namespace Runtime {
         ghosts = {
                         addEntity<Runtime::Pac::Ghost::Blinky>(),
                         addEntity<Runtime::Pac::Ghost::Pinky>(),
+                        addEntity<Runtime::Pac::Ghost::Inky>("Blinky"),
                         addEntity<Runtime::Pac::Ghost::Clyde>(),
         };
 
@@ -29,10 +30,12 @@ namespace Runtime {
         ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>()->state = Runtime::Pac::Ghost::STATE_SCATTER;
         inactive_ghosts = ghosts;
         inactive_ghosts.erase(inactive_ghosts.begin());
+        ghost_released = 0;
 
 
+        inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{96, 120};
         inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 120};
-        inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{128, 120};
+        inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{128, 120};
         // inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = {96, 120};
         
         flags[0] = 1;
@@ -63,8 +66,9 @@ namespace Runtime {
         }
 
         auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
-        auto amount = std::count(tilemap->pellets.begin(), tilemap->pellets.end(), Runtime::Pac::PACPellet::regular);
 
+        auto amount_left = std::count(tilemap->pellets.begin(), tilemap->pellets.end(), Runtime::Pac::PACPellet::regular);
+        auto amount = std::count(tilemap->collision.begin(), tilemap->collision.end(), false) - amount_left;
         if (game_over) {
             if (Runtime::live_count <= 1) {
                 flags[6] = 1;
@@ -100,7 +104,7 @@ namespace Runtime {
         }
 
 
-        if (amount <= 0) {
+        if (amount_left <= 0) {
             flags.set(5);
             clock_delay = std::chrono::duration_cast<decltype(clock_delay)>(
                 std::chrono::seconds(3)
@@ -127,8 +131,13 @@ namespace Runtime {
             SceneManager::gotoScene<Runtime::MainMenu>();
         }
 
+       
+        printf("amount %d,", (int)amount);
 
-        if (inactive_ghosts.size() > (amount/120)) {
+        
+        
+        if ((amount - 60 * ghost_released) > 60) {
+            
             if ((Runtime::current_tick % 3) != 0) goto release_yield_frame;
             const Math::pointi target_active_position = tilemap->position + Math::pointi{112, 92};
             auto pac = inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>();
@@ -147,6 +156,7 @@ namespace Runtime {
 
             #undef PAC_GOTO
             
+            ghost_released += 1;
             inactive_ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>()->state = Runtime::Pac::Ghost::STATE_SCATTER;
             inactive_ghosts.erase(inactive_ghosts.begin());
             pac->m_direction = (std::rand() % 2)? Runtime::Pac::PACDirection::LEFT : Runtime::Pac::PACDirection::RIGHT;

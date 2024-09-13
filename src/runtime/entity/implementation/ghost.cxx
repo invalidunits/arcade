@@ -48,14 +48,19 @@ namespace Runtime {
                             pacman->killPacman();
                         else if (state == STATE_SCARED) {
                             Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::StartSound();
+                            getEntity()->getManager()->addEntity<PointsEffect>(pac->m_position, 200);
+                            Runtime::current_score += 200;  
                             getEntity()->getManager()->addEntityDelay(Runtime::tick_length*20);
                             state = STATE_RETREAT;
+                            
+
+                            state_timer = m_scatter_time;
                         }
                             
                     }
                 }        
 
-                if (pac->atIntersection()) {
+                if (pac->atIntersection() ||  tilemap->isBlocked(pac->getNextTile())) {
                     if (m_behaviors.at(state)) target_tile = m_behaviors[state](this);
                     
                     auto position = pac->m_position;
@@ -134,7 +139,8 @@ namespace Runtime {
                 return {0, 0};
             }
             movement_tile retreatBehavior(Runtime::Pac::Ghost::GhostComponent *comp) {
-                return {0, 0};
+                const Math::pointi &tilemap_size = comp->getEntity()->getComponent<Runtime::Pac::PacComponent>()->getTileMap()->tilemap_size;
+                return {tilemap_size.x/2, tilemap_size.y/2};
             }
         }
     }
@@ -150,5 +156,6 @@ void ateSuper(Runtime::Entity::EntityManager *manager) {
         if (ghost->state == Runtime::Pac::Ghost::STATE_INACTIVE) continue;
 
         ghost->state = Runtime::Pac::Ghost::STATE_SCARED;
+        ghost->state_timer = ghost->m_scatter_time;
     }
 }

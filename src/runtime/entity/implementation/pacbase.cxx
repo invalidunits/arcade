@@ -112,6 +112,7 @@ namespace Runtime {
                     
                     case Pac::PACPellet::super:
                         Runtime::current_score += 100;
+                        getManager()->addEntity<PointsEffect>(pac->m_position, 100);
                         //TODO: Add ghost eating
                         ateSuper(getManager());
                         break;

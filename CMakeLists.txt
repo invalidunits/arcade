@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1...3.27)
+cmake_minimum_required(VERSION 3.12...3.27)
 project(arcade VERSION 1.0.0)
 set (CMAKE_CXX_STANDARD 17)
 
@@ -18,7 +18,7 @@ find_package(SDL2_ttf REQUIRED)
 
 
 
-
+add_definitions(-Dfoo)   
 add_executable(arcade_machine ${SRC} ROM) 
 target_compile_definitions(arcade_machine
     PRIVATE
@@ -34,6 +34,11 @@ add_custom_command(
 
 
 if (APPLE)
+    # Incbin does not support bitcode. disable bitcode and then disable the warning.
+    target_compile_definitions(arcade_machine PRIVATE -DINCBIN_SILENCE_BITCODE_WARNING)
+    set_target_properties(arcade_machine PROPERTIES XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
+
+    # link libraries
     link_directories("/opt/homebrew/Cellar/sdl2/2.30.7/lib")
     link_directories("/opt/homebrew/Cellar/sdl2_mixer/2.8.0/lib")
     link_directories("/opt/homebrew/Cellar/sdl2_ttf/2.22.0/lib")

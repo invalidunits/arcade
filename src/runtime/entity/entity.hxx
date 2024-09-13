@@ -57,6 +57,8 @@ namespace Runtime {
                     if (component != m_components.end()) return static_cast<T*>(component->second.get());
                     m_components.insert_or_assign(Math::getUUID<T>(), std::unique_ptr<Component>((Component *)new T(this, args...)));
                     return getComponent<T>();
+
+                    
                 }
 
                 std::map<Math::UUID, std::unique_ptr<Component>> m_components = {};
@@ -71,9 +73,9 @@ namespace Runtime {
                 \
                 customimpl\
                 \
-                for (const auto &entity : m_entities) { \
-                    entity->m_manager = this; \
-                    entity->func();\
+                for (auto it = m_entities.rbegin(); it != m_entities.rend(); it++) { \
+                    (*it)->m_manager = this; \
+                    (*it)->func();\
                 }   \
             }
 

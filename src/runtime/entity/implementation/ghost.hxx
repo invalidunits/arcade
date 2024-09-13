@@ -66,6 +66,8 @@ namespace Runtime {
 
 
             struct Blinky : Ghost {
+                const inline std::vector<std::string_view> getGroups() const { 
+                    auto groups = Ghost::getGroups(); groups.push_back("Blinky");  return groups; }
                 Blinky() {
                     texture = ARCADE_LOADTEXTROM(IMGghostBlinky);
                     registerComponent<PacComponent>();
@@ -95,7 +97,58 @@ namespace Runtime {
                 }
             };
 
+            struct Inky : Ghost {
+                const inline std::vector<std::string_view> getGroups() const { 
+                    auto groups = Ghost::getGroups(); groups.push_back("Inky");  return groups; }
+                // TODO: make this reference wwe
+                std::string best_friend;
+                Inky(std::string_view _best_friend) {
+                    best_friend = _best_friend;
+                    texture = ARCADE_LOADTEXTROM(IMGghostInky);
+                    registerComponent<PacComponent>();
+                    registerComponent<GhostComponent>(
+                        // Inky's always chasing when Red's out.
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(10)),
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(99999999)),
+                        movement_behavior_array{
+                            // Scatter
+                            [](GhostComponent *comp) {
+                                return movement_tile{ARCADE_LOGIC_WIDTH/tile_size.w, ARCADE_LOGIC_HEIGHT/tile_size.h};
+                            },
+
+                            // Chase
+                            [this](GhostComponent *comp) {
+                                auto pacmen = comp->getEntity()->getManager()->getEntitysFromID("PacMan");
+                                if (pacmen.size() <= 0) {   
+                                    return movement_tile{0, 0};
+                                }
+
+                                auto pacs_tile = pacmen[0]->getComponent<PacComponent>()->getCurrentTile();
+                                auto friends = comp->getEntity()->getManager()->getEntitysFromID(best_friend);
+                                if (friends.size() <= 0) {
+                                    return pacs_tile;                                 
+                                }
+
+                                auto best_friend = friends[0];
+
+                                if (best_friend->getComponent<GhostComponent>()->state != STATE_CHASE) {
+                                    return retreatBehavior(comp);
+                                }
+
+                                auto best_friend_tile = best_friend->getComponent<PacComponent>()->getCurrentTile();
+                                auto bestys_offset = best_friend_tile - pacs_tile;
+                                return pacs_tile - bestys_offset;
+                            },
+                            scaredBehavior,
+                            retreatBehavior
+                        }
+                    );
+                }
+            };
+
             struct Pinky : Ghost {
+                const inline std::vector<std::string_view> getGroups() const { 
+                    auto groups = Ghost::getGroups(); groups.push_back("Pinky");  return groups; }
                 Pinky() {
                     texture = ARCADE_LOADTEXTROM(IMGghostPinky);
                     registerComponent<PacComponent>();
@@ -127,6 +180,8 @@ namespace Runtime {
             };
 
             struct Clyde : Ghost {
+                const inline std::vector<std::string_view> getGroups() const { 
+                    auto groups = Ghost::getGroups(); groups.push_back("Clyde");  return groups; }
                 static constexpr unsigned int pacman_follow_distance = 6;
 
 

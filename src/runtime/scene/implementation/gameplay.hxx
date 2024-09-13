@@ -28,6 +28,7 @@ namespace Runtime {
         std::vector<Runtime::Pac::Ghost::Ghost*> ghosts = {};
         std::vector<Runtime::Pac::Ghost::Ghost*> inactive_ghosts = {};
         Runtime::duration clock_delay = decltype(clock_delay)::zero();
+        int ghost_released = 0;
         bool game_over = false;
     };
 }
