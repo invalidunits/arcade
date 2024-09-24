@@ -48,18 +48,29 @@ namespace Runtime {
 
         // TODO: Add dynamic loading for multiple tilemaps. Ms. Pacman... etc...
         struct Tilemap: public Runtime::Entity::Entity {
-            Tilemap() {
-                tilemap_texture =           ARCADE_LOADTEXTROM(IMGmaze);
+            Tilemap(Graphics::shared_texture tilemap_image, Graphics::shared_surface tilemap_collision) {
+                tilemap_texture =           tilemap_image;
                 collectables_texture =      ARCADE_LOADTEXTROM(IMGmazeCollectables);
                 int x, y, depth;
-                auto collide = stbi_load_from_memory((stbi_uc *)ROM::gIMGmazeCollisionData, ROM::gIMGmazeCollisionSize, &x, &y, &depth, 1);
-                for (size_t i = 0; i < (x*y); i++) {
-                    slow_moving_tile.push_back( collide[i] == 60);
-                    if (collide[i] == 255) collision.push_back(true), pellets.push_back(PACPellet::none); 
+                ghost_hut_entrance = Math::pointi{112, 92};
+                ghost_hut_home = Math::pointi{112, 120};
+                if (SDL_MUSTLOCK(tilemap_collision.get()))
+                    SDL_assert_always(SDL_LockSurface(tilemap_collision.get()) == 0);
+                SDL_assert_always(tilemap_collision->format->BytesPerPixel == 4);
+                for (size_t i = 0; i < (tilemap_collision->w*tilemap_collision->h); i++) {
+                    Uint32 pixel = *(Uint32*)((Uint8*)tilemap_collision->pixels + i*tilemap_collision->format->BytesPerPixel);
+                    SDL_Color color = { 0 };
+                    SDL_GetRGB(pixel, tilemap_collision->format, &color.r, &color.g, & color.b);
+
+                    uint8_t value = color.r;
+
+
+                    slow_moving_tile.push_back( value == 60);
+                    if (value == 255) collision.push_back(true), pellets.push_back(PACPellet::none); 
 
                     else {
                         collision.push_back(false);
-                        switch (collide[i]) {
+                        switch (value) {
                             case 143:
                                 pellets.push_back(PACPellet::super); break;
 
@@ -73,10 +84,12 @@ namespace Runtime {
                     }
                     
                 }
-                stbi_image_free(collide);
 
                 SDL_assert(!SDL_QueryTexture(tilemap_texture.get(), nullptr, nullptr, &tilemap_size.x, &tilemap_size.y));
                 tilemap_size = tilemap_size / tile_size;
+
+                if (SDL_MUSTLOCK(tilemap_collision.get()))
+                    SDL_UnlockSurface(tilemap_collision.get());
             }
 
             void draw() {
@@ -141,6 +154,11 @@ namespace Runtime {
 
             Math::pointi position = {};
             Math::pointi tilemap_size = {};
+
+            Math::pointi ghost_hut_entrance = {};
+            Math::pointi ghost_hut_home = {};
+            bool ghost_hut_busy = false;
+
 
             Graphics::shared_texture tilemap_texture = nullptr;
             Graphics::shared_texture collectables_texture = nullptr;

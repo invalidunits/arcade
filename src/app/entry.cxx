@@ -16,6 +16,7 @@ using namespace Graphics;
 #include <system/controls.hxx>
 
 #include <sfx/sfx.hxx>
+#include <runtime/scene/implementation/intermission.hxx>
 
 enum orientation {
     landscape,
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
         Runtime::live_count = 999;
         Runtime::SceneManager::pushScene<Runtime::Gameplay>();
     } else {
-        Runtime::SceneManager::pushScene<Runtime::MainMenu>();
+        Runtime::SceneManager::pushScene<Runtime::Intermission>();
     }
 
     Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::InitializeSFX(ROM::gSFXBeginSize);

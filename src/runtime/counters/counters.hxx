@@ -69,6 +69,7 @@ namespace Runtime {
 
     inline unsigned short high_score = 0;
     inline unsigned short current_score = 0;
+    inline unsigned short level = 0;
 
     inline unsigned int live_count = 0;
     inline unsigned int coin_display = 0;

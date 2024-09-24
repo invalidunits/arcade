@@ -19,31 +19,38 @@ namespace Runtime {
 
     class LiveCutscene : public Entity::EntityManager {
         constexpr static auto default_life_time = std::chrono::duration_cast<Runtime::duration>(Runtime::tick_length*ARCADE_LOGIC_WIDTH);
-        struct pac_t {
-            bool evaluated = false;
-            Runtime::duration time_elapsed = Runtime::duration::zero();
-            Runtime::duration life_time = Runtime::duration::zero();
-            enum sprite_t : unsigned char {
-                pacman,
-                woman,
-                legman,
-                kidman,
-                largeman,
-
-                smugman, // Smugman is "special"
-
-                endman
-            } sprite;
-            float random = 0;
-        };
-
         unsigned int _coin_display = 0;
         Graphics::shared_texture pacmen_cutscene = nullptr;
-        std::vector<pac_t> pacmen;
+
+
+        
         
         
         public:
-            
+            struct pac_t {
+                bool evaluated = false;
+                Runtime::duration time_elapsed = Runtime::duration::zero();
+                Runtime::duration life_time = Runtime::duration::zero();
+                enum sprite_t : unsigned char {
+                    pacman,
+                    woman,
+                    kidman,
+                    legman,
+                    largeman,
+
+                    smugman, // Smugman is "special"
+
+                    endman, // This doesn't have an animation, This just represents the amount of pacman variations in the list.
+
+                    // For Intermissions.
+                    inky,
+                    blinky,
+                    pinky,
+                    clyde,
+                    
+                } sprite;
+                float random = 0;
+            };
 
             LiveCutscene();
             void setup();
@@ -57,7 +64,8 @@ namespace Runtime {
             Runtime::duration m_do_stuff_timer = Runtime::duration::zero();
 
             
-        
+        private:
+            std::vector<pac_t> pacmen;
     };
     
     

@@ -22,8 +22,12 @@ namespace Runtime {
                 STATE_CHASE,
                 STATE_SCARED,
                 STATE_RETREAT,
+
                 STATE_LAST,
                 STATE_INACTIVE,
+                
+                STATE_BASE_ENTERING,
+                STATE_BASE_EXITING,
             };
             
             movement_tile scaredBehavior(GhostComponent *ghostcomponent);

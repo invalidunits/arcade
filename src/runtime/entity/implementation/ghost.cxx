@@ -17,9 +17,64 @@ namespace Runtime {
                     return;
                 }
 
+                #define PAC_GOTO(axis, pdir, ndir) if (pac->m_position.axis != target_active_position.axis) { \
+                    unsigned int vec = std::signbit(target_active_position.axis - pac->m_position.axis)? -1 : 1; \
+                    auto         dir = std::signbit(target_active_position.axis - pac->m_position.axis)? ndir : pdir;  \
+                    pac->m_position.axis += vec; \
+                    pac->m_direction = dir; \
+                    return; \
+                }
+            
+
+            
+
+                if (state == STATE_BASE_ENTERING) {
+                    tilemap->ghost_hut_busy = true;
+                    pac->moving = false;
+                    if (Runtime::current_tick % 2 == 0) {
+                        auto target_active_position = tilemap->ghost_hut_home + tilemap->position;
+                        PAC_GOTO(x, Runtime::Pac::PACDirection::LEFT,   Runtime::Pac::PACDirection::RIGHT);
+                        PAC_GOTO(y, Runtime::Pac::PACDirection::DOWN,   Runtime::Pac::PACDirection::UP);
+                        state = STATE_BASE_EXITING; 
+                    } else return;
+                }
+
+
+                if (state == STATE_BASE_EXITING) {
+                    tilemap->ghost_hut_busy = true;
+                    pac->moving = false;
+                    if (Runtime::current_tick % 2 == 0) {
+                        auto target_active_position = tilemap->ghost_hut_entrance + tilemap->position;
+                        PAC_GOTO(x, Runtime::Pac::PACDirection::LEFT,   Runtime::Pac::PACDirection::RIGHT);
+                        PAC_GOTO(y, Runtime::Pac::PACDirection::DOWN,   Runtime::Pac::PACDirection::UP);
+                        tilemap->ghost_hut_busy = false;
+                        state = STATE_SCATTER; 
+                    } else return;
+                }
+
+                if (state == STATE_RETREAT && !tilemap->ghost_hut_busy) {
+                    auto diff = pac->m_position - (tilemap->ghost_hut_entrance + tilemap->position);
+                    auto difference = sqrt(diff.x*diff.x + diff.y*diff.y);
+
+                    if (difference < 8) {
+                        state = STATE_BASE_ENTERING;
+                        return;
+                    }
+                    
+                }
+
+
+                #undef PAC_GOTO
+
+                // Some states are handled specially and don't have behavior functions.
+                if (state >= STATE_LAST) {
+                    return;
+                }
 
                 pac->moving = true;
-                state_timer -= Runtime::tick_length;
+
+                if (state != STATE_SCARED)
+                    state_timer -= Runtime::tick_length;
                 if (state_timer.count() < 0) {
                     switch (state) {
                         default:
@@ -37,6 +92,7 @@ namespace Runtime {
                 }
 
                 auto pacmen = getEntity()->getManager()->getEntitysFromID("PacMan");
+                
 
                 
                 if (pacmen.size() > 0) {                       
@@ -104,7 +160,7 @@ namespace Runtime {
             
                 
                 SDL_Rect dst = {pac->m_position.x - ghost_width/2, pac->m_position.y - ghost_height/2, ghost_width, ghost_height};
-                if (ghost->state != STATE_RETREAT) 
+                if (ghost->state != STATE_RETREAT && ghost->state != STATE_BASE_ENTERING) 
                     SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
 
                 dontrenderbody:
@@ -153,7 +209,7 @@ void ateSuper(Runtime::Entity::EntityManager *manager) {
     Runtime::Sound::SoundEffect<ROM::gSFXeatFruitData>::StartSound();
     for (auto&& entity : manager->getEntitysFromGroups("Ghost")) {
         Runtime::Pac::Ghost::GhostComponent *ghost = entity->getComponent<Runtime::Pac::Ghost::GhostComponent>();
-        if (ghost->state == Runtime::Pac::Ghost::STATE_INACTIVE) continue;
+        if (ghost->state >= Runtime::Pac::Ghost::STATE_LAST) continue;
 
         ghost->state = Runtime::Pac::Ghost::STATE_SCARED;
         ghost->state_timer = ghost->m_scatter_time;

@@ -12,6 +12,7 @@ namespace Runtime {
 
         Runtime::display_coins = false;
         Runtime::Entity::EntityManager::setup();
+        level = 1;
         Runtime::current_score = 0;
         pacmen = {};
         live_count = coin_display/life_value;

@@ -20,6 +20,10 @@ extern "C" {
 
 	INCBIN(IMGmaze, "rom/img/maze.png");
 	INCBIN(IMGmazeCollision, "rom/img/maze_collision.png");
+
+	INCBIN(IMGmaze1, "rom/img/maze1.png");
+	INCBIN(IMGmaze1Collision, "rom/img/maze1_collision.png");
+
 	INCBIN(IMGmazeCollectables, "rom/img/maze_collectables.png");
 	
 	INCBIN(IMGghostBlinky, "rom/img/ghost/blinky.png");

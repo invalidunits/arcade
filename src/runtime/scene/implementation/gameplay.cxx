@@ -4,13 +4,29 @@
 #include <sfx/sfx.hxx>
 #include <optional>
 
+#include "intermission.hxx"
+
+
 std::optional<std::vector<Runtime::Pac::PACPellet>> save_pellets = {}; 
 
 namespace Runtime {
     void Gameplay::setup() {
         
         Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::StartSound();
-        auto tilemap =  addEntity<Runtime::Pac::Tilemap>();
+
+        if (level % 2 == 0) {
+            addEntity<Runtime::Pac::Tilemap>(
+                ARCADE_LOADTEXTROM(IMGmaze1),
+                ARCADE_LOADSURFROM(IMGmaze1Collision)
+            );
+        } else {
+            addEntity<Runtime::Pac::Tilemap>(
+                ARCADE_LOADTEXTROM(IMGmaze),
+                ARCADE_LOADSURFROM(IMGmazeCollision)
+            );
+        }
+
+        auto tilemap = static_cast<Runtime::Pac::Tilemap*>(getEntitysFromID("Tilemap")[0]);
         tilemap->position = {0, 18};
 
         auto pacman =   addEntity<Runtime::Pac::PacMan>();
@@ -33,9 +49,9 @@ namespace Runtime {
         ghost_released = 0;
 
 
-        inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{96, 120};
-        inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 120};
-        inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{128, 120};
+        inactive_ghosts[1]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->ghost_hut_home + Math::pointi{-16, 16};
+        inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->ghost_hut_home + Math::pointi{0,  16};
+        inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->ghost_hut_home + Math::pointi{16, 16};
         // inactive_ghosts[2]->getComponent<Runtime::Pac::PacComponent>()->m_position = {96, 120};
         
         flags[0] = 1;
@@ -90,9 +106,13 @@ namespace Runtime {
 
         if (flags[4]) {
             Runtime::current_score += 1000;
+            level += 1;
             flags = 0;
             SceneManager::popScene();
-            SceneManager::pushScene<Gameplay>();
+
+            // Second level and every multiple of 5 levels has an intermissions.
+            if (level == 2 || level % 5 == 0) 
+                SceneManager::pushScene<Intermission>();
             return;
         }
 
@@ -136,30 +156,22 @@ namespace Runtime {
 
         
         
-        if ((amount - 60 * ghost_released) > 60) {
+        if ((amount - 60 * ghost_released) > 60 && ghost_released < 3) {
             
             if ((Runtime::current_tick % 3) != 0) goto release_yield_frame;
             const Math::pointi target_active_position = tilemap->position + Math::pointi{112, 92};
             auto pac = inactive_ghosts[0]->getComponent<Runtime::Pac::PacComponent>();
+            auto ghost = inactive_ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>();
+            if (ghost->state == Runtime::Pac::Ghost::STATE_INACTIVE && !tilemap->ghost_hut_busy)
+                ghost->state = Runtime::Pac::Ghost::STATE_BASE_EXITING;
 
-            #define PAC_GOTO(axis, pdir, ndir) if (pac->m_position.axis != target_active_position.axis) { \
-                unsigned int vec = std::signbit(target_active_position.axis - pac->m_position.axis)? -1 : 1; \
-                auto         dir = std::signbit(target_active_position.axis - pac->m_position.axis)? ndir : pdir;  \
-                pac->m_position.axis += vec; \
-                pac->m_direction = dir; \
-                goto release_yield_frame; \
+
+            if (ghost->state != Runtime::Pac::Ghost::STATE_BASE_EXITING && ghost->state != Runtime::Pac::Ghost::STATE_INACTIVE) {
+                ghost_released += 1;
+                inactive_ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>()->state = Runtime::Pac::Ghost::STATE_SCATTER;
+                inactive_ghosts.erase(inactive_ghosts.begin());
+                pac->m_direction = (std::rand() % 2)? Runtime::Pac::PACDirection::LEFT : Runtime::Pac::PACDirection::RIGHT;
             }
-            
-
-            PAC_GOTO(x, Runtime::Pac::PACDirection::LEFT,   Runtime::Pac::PACDirection::RIGHT);
-            PAC_GOTO(y, Runtime::Pac::PACDirection::DOWN,   Runtime::Pac::PACDirection::UP);
-
-            #undef PAC_GOTO
-            
-            ghost_released += 1;
-            inactive_ghosts[0]->getComponent<Runtime::Pac::Ghost::GhostComponent>()->state = Runtime::Pac::Ghost::STATE_SCATTER;
-            inactive_ghosts.erase(inactive_ghosts.begin());
-            pac->m_direction = (std::rand() % 2)? Runtime::Pac::PACDirection::LEFT : Runtime::Pac::PACDirection::RIGHT;
         }
 
         release_yield_frame:
