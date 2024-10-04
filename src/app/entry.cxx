@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
 
     
 
-    const auto font_data = SDL_RWFromConstMem(ROM::gEmuLogicData, ROM::gEmuLogicSize);
-    Graphics::default_font = TTF_OpenFontRW(font_data, 1, 8);
+    const auto font_data = SDL_RWFromConstMem(ROM::gArcadePixPlusData, ROM::gArcadePixPlusSize);
+    Graphics::default_font = TTF_OpenFontRW(font_data, 1, 16);
     if (Graphics::default_font == nullptr) {
         printf("The application crashed due to the following error: %s", SDL_GetError());
         exit(1);
@@ -72,6 +72,10 @@ int main(int argc, char *argv[]) {
         Runtime::SceneManager::pushScene<Runtime::Gameplay>();
     } else {
         Runtime::SceneManager::pushScene<Runtime::MainMenu>();
+        /*
+                    Runtime::SceneManager::pushScene<Runtime::HighscoreScene>();
+        ((Runtime::HighscoreScene*)Runtime::SceneManager::getCurrentScene())->newHighScore(0);
+        */
     }
 
     Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::InitializeSFX(ROM::gSFXBeginSize);

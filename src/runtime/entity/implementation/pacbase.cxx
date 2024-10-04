@@ -76,8 +76,8 @@ namespace Runtime {
 
             pac->moving = !dead;
 
-            auto x_axis = std::abs(x_axis_raw) > deadzone? (0 < x_axis_raw) - (x_axis_raw < 0) : 0;
-            auto y_axis = std::abs(y_axis_raw) > deadzone? (0 < y_axis_raw) - (y_axis_raw < 0) : 0;
+            auto x_axis = std::abs(x_axis_raw) > Controls::deadzone? (0 < x_axis_raw) - (x_axis_raw < 0) : 0;
+            auto y_axis = std::abs(y_axis_raw) > Controls::deadzone? (0 < y_axis_raw) - (y_axis_raw < 0) : 0;
             Math::pointi input = {
                 x_axis,
                 y_axis

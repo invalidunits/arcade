@@ -16,6 +16,7 @@
 #include <system/controls.hxx>
 
 #include <runtime/counters/counters.hxx>
+#include "highscores.hxx"
 
 namespace Runtime {
     class MainMenu : public Scene {

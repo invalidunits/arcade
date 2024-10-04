@@ -4,6 +4,7 @@
 
 extern "C" {
 	INCBIN(EmuLogic, "rom/emulogic.ttf");
+	INCBIN(ArcadePixPlus, "rom/arcadepix_plus.ttf");
 
 	// Main Menu
 	INCBIN(IMGmainMenu, "rom/img/main_menu.png");

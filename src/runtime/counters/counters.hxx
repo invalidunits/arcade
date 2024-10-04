@@ -33,7 +33,7 @@ namespace Runtime {
             void update() {
                 m_elapsed_time += Runtime::delta_time;
                 if (m_elapsed_time > life_time) 
-                    m_manager->removeEntity(this);
+                    this->queueFree();
             }
 
             void draw() {
@@ -67,8 +67,8 @@ namespace Runtime {
     };
 
 
-    inline unsigned short high_score = 0;
-    inline unsigned short current_score = 0;
+    inline uint32_t high_score = 0;
+    inline uint32_t current_score = 0;
     inline unsigned short level = 0;
 
     inline unsigned int live_count = 0;

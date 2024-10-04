@@ -14,15 +14,13 @@ SDL_GameControllerButton button_bind[Controls::BUTTON_END] = {
     SDL_CONTROLLER_BUTTON_A, // A
     SDL_CONTROLLER_BUTTON_B, // B
 
-    SDL_CONTROLLER_BUTTON_X, // Start
     SDL_CONTROLLER_BUTTON_Y, // Select
 };
 
 SDL_Scancode keyboard_button_bind[Controls::BUTTON_END] = {
     SDL_SCANCODE_Z,
     SDL_SCANCODE_X,
-
-    SDL_SCANCODE_SPACE,
+    
     SDL_SCANCODE_RETURN,  
 };
 
@@ -59,8 +57,7 @@ void controlLoop() {
                 value = bool(SDL_GameControllerGetButton(controller, button_bind[input]));
             
             const Uint8 *key = SDL_GetKeyboardState(nullptr);
-            const ptrdiff_t key_input = input * 2;
-            value = value || key[keyboard_button_bind[key_input]];
+            value = value || key[keyboard_button_bind[input]];
             Controls::button_inputs[input].store(value);
         }
 

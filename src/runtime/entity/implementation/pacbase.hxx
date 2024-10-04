@@ -52,8 +52,6 @@ namespace Runtime {
                 int inverse_speed = 1.0;
                 PACDirection m_direction = PACDirection::RIGHT;
             };
-
-            constexpr int16_t deadzone = 8192;
     
             struct PacMan : public Entity::Entity {
                 PacMan() {

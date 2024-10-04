@@ -64,8 +64,9 @@ namespace Runtime {
 
 
     void Gameplay::update() {
-        if (Controls::button_inputs[Controls::BUTTON_A]) 
+        if (Controls::button_inputs[Controls::BUTTON_A] && flags[0]) {
             clock_delay = decltype(clock_delay)::zero();
+        }
 
         if (clock_delay.count() > 0) {
             clock_delay -= Runtime::delta_time;
@@ -148,7 +149,10 @@ namespace Runtime {
         }
 
         if (flags.test(6)) {
-            SceneManager::gotoScene<Runtime::MainMenu>();
+            Runtime::live_count = 0;
+            SceneManager::gotoScene<Runtime::HighscoreScene>();
+            static_cast<Runtime::HighscoreScene*>(Runtime::SceneManager::getCurrentScene())->newHighScore(
+                    Runtime::current_score);
         }
 
        

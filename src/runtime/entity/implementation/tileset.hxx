@@ -117,6 +117,7 @@ namespace Runtime {
 
                             case PACPellet::super:
                                 src = {8, 0, 8, 8}; break;
+                            default: break;
                         }
 
                         SDL_assert(!SDL_RenderCopy(Graphics::renderer, collectables_texture.get(), &src, &dst));

@@ -54,7 +54,6 @@ namespace Runtime {
             int frame = 0;
             unsigned int tick = (pac.time_elapsed/Runtime::tick_length);
             switch (pac.sprite) {
-                
                 case LiveCutscene::pac_t::legman:
                     frame_count = 4;
                     src = {0, 48, 16, 16};
@@ -65,6 +64,27 @@ namespace Runtime {
                 case LiveCutscene::pac_t::woman:
                     src = {48, 0, 16, 16};
                     goto pac_frame_logic;
+                
+                case LiveCutscene::pac_t::blinky:
+                    frame_count = 2;
+                    src = {112, 64, 16, 16};
+                    goto pac_frame_logic;
+                
+                case LiveCutscene::pac_t::pinky:
+                    frame_count = 2;
+                    src = {144, 64, 16, 16};
+                    goto pac_frame_logic;
+
+                case LiveCutscene::pac_t::inky:
+                    frame_count = 2;
+                    src = {176, 64, 16, 16};
+                    goto pac_frame_logic;
+                
+                case LiveCutscene::pac_t::clyde:
+                    frame_count = 2;
+                    src = {208, 64, 16, 16};
+                    goto pac_frame_logic;
+
                 case LiveCutscene::pac_t::pacman:
                     pac_frame_logic:
                         frame = (tick/3 + int(pac.random*100) % 4)% frame_count;

@@ -39,7 +39,7 @@ namespace Graphics {
     #define ARCADE_LOADTEXTROM(rom) ::Graphics::loadTexture((void *)ROM::g ## rom ## Data, ROM::g ## rom ## Size, #rom)
 
     void drawText(Math::recti bounds, std::string_view text, SDL_Renderer *renderer,
-        Math::color8a color = Math::color8a(~0, ~0, ~0, ~0), TTF_Font *font = nullptr);
+        Math::color8a color = Math::color8a(~0, ~0, ~0, ~0), bool center = false, TTF_Font *font = nullptr);
 }
 
 

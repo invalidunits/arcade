@@ -9,7 +9,6 @@ namespace Runtime {
     }
 
     void MainMenu::setup() {
-        Runtime::display_coins = true;
         Runtime::current_score = 0;
         Runtime::coin_display = 0;
     }
@@ -18,8 +17,8 @@ namespace Runtime {
 
     void MainMenu::update_fixed() {
         Runtime::fixedupdateCounter();
-        int frame = Runtime::current_tick;
-        bool start_button = (Controls::button_inputs[Controls::BUTTON_A] || Controls::button_inputs[Controls::BUTTON_START]);
+        auto frame = Runtime::current_tick;
+        bool start_button = (Controls::button_inputs[Controls::BUTTON_A]);
         const Uint8 *key = SDL_GetKeyboardState(nullptr);
         bool enter_coin = false;
         #ifdef DEBUG
@@ -30,10 +29,18 @@ namespace Runtime {
             first_ready = true;
             coin_update_frame = 3;
         }
-
+ 
 
         if ((frame % 6) == 0) 
             coin_update_frame -= 1;
+        
+        if ((frame % 16) == 0) {
+            if (Controls::button_inputs[Controls::BUTTON_SELECT]) {
+                Runtime::SceneManager::pushScene<Runtime::HighscoreScene>();
+                return;
+            } 
+        }
+      
 
         if ((frame % 16) == 0) {
             if (enter_coin) {
@@ -77,10 +84,9 @@ namespace Runtime {
 
         SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(ghostframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
         SDL_RenderCopy(Graphics::renderer, main_menu_ghost.get(), &rect, nullptr);
-        Runtime::drawCounter();
-        
 
-            
+        Runtime::display_coins = true;
+        Runtime::drawCounter();
     }
 
     bool MainMenu::can_start(void) {

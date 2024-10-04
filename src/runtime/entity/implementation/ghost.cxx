@@ -33,7 +33,7 @@ namespace Runtime {
                     pac->moving = false;
                     if (Runtime::current_tick % 2 == 0) {
                         auto target_active_position = tilemap->ghost_hut_home + tilemap->position;
-                        PAC_GOTO(x, Runtime::Pac::PACDirection::LEFT,   Runtime::Pac::PACDirection::RIGHT);
+                        PAC_GOTO(x, Runtime::Pac::PACDirection::RIGHT,   Runtime::Pac::PACDirection::LEFT);
                         PAC_GOTO(y, Runtime::Pac::PACDirection::DOWN,   Runtime::Pac::PACDirection::UP);
                         state = STATE_BASE_EXITING; 
                     } else return;
@@ -108,9 +108,8 @@ namespace Runtime {
                             Runtime::current_score += 200;  
                             getEntity()->getManager()->addEntityDelay(Runtime::tick_length*20);
                             state = STATE_RETREAT;
-                            
-
                             state_timer = m_scatter_time;
+                            return;
                         }
                             
                     }

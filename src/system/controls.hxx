@@ -12,7 +12,6 @@ namespace Controls {
         BUTTON_A = 0,
         BUTTON_B,
         
-        BUTTON_START,
         BUTTON_SELECT,
 
         // 
@@ -28,6 +27,7 @@ namespace Controls {
         AXIS_END
     };
     
+    constexpr int16_t deadzone = 8192;
     inline std::atomic<bool>    button_inputs[BUTTON_END] = {};
     inline std::atomic<int16_t>   axis_inputs[AXIS_END] = {};
 

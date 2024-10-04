@@ -6,6 +6,7 @@
 namespace ROM {
     extern "C" {
         INCBIN_EXTERN(EmuLogic);
+        INCBIN_EXTERN(ArcadePixPlus);
         INCBIN_EXTERN(IMGmainMenu);
 	    INCBIN_EXTERN(IMGmainMenuCoin);
 	    INCBIN_EXTERN(IMGmainMenuStart);
