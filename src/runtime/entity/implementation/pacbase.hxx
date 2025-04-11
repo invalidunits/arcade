@@ -16,6 +16,10 @@ namespace Runtime {
     namespace Pac {
             // To prevent invalid conversions.
 
+            struct IKillable {
+                virtual void kill() = 0;
+            };
+
 
             struct PacComponent : public Entity::Component {   
                 PacComponent(Entity::Entity *entity): Entity::Component(entity) {}
@@ -49,11 +53,13 @@ namespace Runtime {
                 movement_tile last_tile = {8, 8}; 
                 Math::pointi m_position = {8, 8}; 
                 bool moving = false;
-                int inverse_speed = 1.0;
+                int inverse_speed = 1;
+                int repeat = 0;
                 PACDirection m_direction = PACDirection::RIGHT;
             };
+
     
-            struct PacMan : public Entity::Entity {
+            struct PacMan : public Entity::Entity, public virtual IKillable {
                 PacMan() {
                     pacman_texture = ARCADE_LOADTEXTROM(IMGpacman);
                     registerComponent<PacComponent>();
@@ -64,17 +70,31 @@ namespace Runtime {
                 void update();
                 void draw();
 
-                void killPacman();
+                void kill();
 
                 Graphics::shared_texture pacman_texture = nullptr;
                 Runtime::duration time_elasped = Runtime::duration::zero();
                 Runtime::Pac::PACDirection m_direction_buffer = PACDirection::LAST;
 
+                const auto get_fireman_timer() {return fire_man_timer; }
+
                 protected:
+                    Runtime::duration fire_man_timer = Runtime::duration::zero();
+                    int fireball_count = 0;
+                    bool fire_ball_input = false;
+
+
                     bool dead = false;
                     decltype(Runtime::current_tick) dead_tick = 0;
             };
-        
+
+            struct FireBall : public Entity::Entity { 
+                Graphics::shared_texture collectables_texture = nullptr;
+                FireBall(Math::pointi pos, Pac::PACDirection dir);
+                void update_fixed();
+                void draw();
+                Runtime::duration timeout_time = Runtime::duration::zero();
+            };
     }
    
 }

@@ -6,6 +6,7 @@
 #include <memory>
 #include <type_traits>
 #include <runtime/scene/scene.hxx>
+#include <list>
 
 namespace Runtime {
     namespace Entity {
@@ -136,6 +137,15 @@ namespace Runtime {
                 }
                 return ret;
             }
+
+            std::list<std::unique_ptr<Entity>>::iterator begin() {
+                return m_entities.begin();
+            }
+
+            std::list<std::unique_ptr<Entity>>::iterator end() {
+                return m_entities.end();
+            }
+            
             
             
 
@@ -157,7 +167,7 @@ namespace Runtime {
                 removeEntity(it);
             }
 
-            void removeEntity(const std::vector<std::unique_ptr<Entity>>::iterator &it) {
+            void removeEntity(const std::list<std::unique_ptr<Entity>>::iterator &it) {
                 if (it != m_entities.end()) {
                     it->get()->cleanup();
                     m_entities.erase(it);
@@ -172,7 +182,7 @@ namespace Runtime {
             
             protected:
                 Runtime::duration entity_delay = decltype(entity_delay)::zero();
-                std::vector<std::unique_ptr<Entity>> m_entities = {};
+                std::list<std::unique_ptr<Entity>> m_entities = {};
         };
     }
 }

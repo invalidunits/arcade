@@ -1,5 +1,4 @@
 #include "ghost.hxx"
-#include <sfx/sfx.hxx>
 
 namespace Runtime {
     namespace Pac {
@@ -101,14 +100,9 @@ namespace Runtime {
                     auto dist_squared = std::pow(pacman_pac->m_position.x - pac->m_position.x, 2) + std::pow(pacman_pac->m_position.y - pac->m_position.y, 2);
                     if (dist_squared < std::pow(4, 2)) {
                         if (state == STATE_CHASE || state == STATE_SCATTER)
-                            pacman->killPacman();
+                            pacman->kill();
                         else if (state == STATE_SCARED) {
-                            Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::StartSound();
-                            getEntity()->getManager()->addEntity<PointsEffect>(pac->m_position, 200);
-                            Runtime::current_score += 200;  
-                            getEntity()->getManager()->addEntityDelay(Runtime::tick_length*20);
-                            state = STATE_RETREAT;
-                            state_timer = m_scatter_time;
+                            killGhost();
                             return;
                         }
                             

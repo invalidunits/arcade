@@ -9,6 +9,7 @@
 #include "pacbase.hxx"
 #include "tileset.hxx"
 
+#include <sfx/sfx.hxx>
 #include <functional>
 #include <array>
 
@@ -44,6 +45,17 @@ namespace Runtime {
                         state_timer = m_scatter_time;
                     }
 
+                void killGhost() {
+                    if (state <= STATE_SCARED) {
+                        PacComponent *pac  = m_entity->getComponent<PacComponent>();
+                        Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::StartSound();
+                        getEntity()->getManager()->addEntity<PointsEffect>(pac->m_position, 200);
+                        Runtime::current_score += 200;  
+                        getEntity()->getManager()->addEntityDelay(Runtime::tick_length*20);
+                        state = STATE_RETREAT;
+                        state_timer = m_scatter_time;
+                    }
+                }
                 void update_fixed();
 
 
@@ -61,7 +73,10 @@ namespace Runtime {
 
             constexpr int ghost_width = 16, ghost_height = 16;
 
-            struct Ghost : Entity::Entity {
+            struct Ghost : Entity::Entity, IKillable {
+                void kill() {
+                    getComponent<GhostComponent>()->killGhost();
+                }
                 void draw();
                 const inline std::vector<std::string_view> getGroups() const {return {"Ghost"}; }
                 Graphics::shared_texture texture;
@@ -70,8 +85,7 @@ namespace Runtime {
 
 
             struct Blinky : Ghost {
-                const inline std::vector<std::string_view> getGroups() const { 
-                    auto groups = Ghost::getGroups(); groups.push_back("Blinky");  return groups; }
+                const inline std::string_view getIdentity() const { return "Blinky"; }
                 Blinky() {
                     texture = ARCADE_LOADTEXTROM(IMGghostBlinky);
                     registerComponent<PacComponent>();
@@ -102,8 +116,7 @@ namespace Runtime {
             };
 
             struct Inky : Ghost {
-                const inline std::vector<std::string_view> getGroups() const { 
-                    auto groups = Ghost::getGroups(); groups.push_back("Inky");  return groups; }
+                const inline std::string_view getIdentity() const { return "Inky"; }
                 // TODO: make this reference wwe
                 std::string best_friend;
                 Inky(std::string_view _best_friend) {
@@ -151,8 +164,7 @@ namespace Runtime {
             };
 
             struct Pinky : Ghost {
-                const inline std::vector<std::string_view> getGroups() const { 
-                    auto groups = Ghost::getGroups(); groups.push_back("Pinky");  return groups; }
+                const inline std::string_view getIdentity() const { return "Pinky"; }
                 Pinky() {
                     texture = ARCADE_LOADTEXTROM(IMGghostPinky);
                     registerComponent<PacComponent>();
@@ -184,6 +196,7 @@ namespace Runtime {
             };
 
             struct Clyde : Ghost {
+                const inline std::string_view getIdentity() const { return "Clyde"; }
                 const inline std::vector<std::string_view> getGroups() const { 
                     auto groups = Ghost::getGroups(); groups.push_back("Clyde");  return groups; }
                 static constexpr unsigned int pacman_follow_distance = 6;

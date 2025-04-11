@@ -42,7 +42,8 @@ namespace Runtime {
         enum struct PACPellet: unsigned char {
             none,
             regular,
-            super
+            super,
+            fire_super
         };
 
 
@@ -72,7 +73,12 @@ namespace Runtime {
                         collision.push_back(false);
                         switch (value) {
                             case 143:
-                                pellets.push_back(PACPellet::super); break;
+                                {
+                                    auto pellet = std::rand() % 2 == 0? PACPellet::fire_super : PACPellet::super;
+                                    pellets.push_back(pellet);
+                                }
+                                
+                                break;
 
                             default:
     
@@ -117,6 +123,9 @@ namespace Runtime {
 
                             case PACPellet::super:
                                 src = {8, 0, 8, 8}; break;
+
+                            case PACPellet::fire_super:
+                                src = {16, 0, 8, 8}; break;
                             default: break;
                         }
 

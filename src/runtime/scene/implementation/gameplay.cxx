@@ -111,9 +111,12 @@ namespace Runtime {
             flags = 0;
             SceneManager::popScene();
 
-            // Second level and every multiple of 5 levels has an intermissions.
-            if (level == 2 || level % 5 == 0) 
+            // Second level and every multiple of 4 levels has an intermissions.
+            if (level == 2 || level % 4 == 0) 
                 SceneManager::pushScene<Intermission>();
+            else {
+                SceneManager::pushScene<Gameplay>();
+            }
             return;
         }
 
