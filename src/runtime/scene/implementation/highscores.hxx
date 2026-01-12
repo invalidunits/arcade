@@ -18,6 +18,9 @@ namespace Runtime
     constexpr std::size_t highscore_row_size = high_score_name_size + sizeof(highscore_t);
     inline std::list<std::pair<std::string, uint32_t>> high_scores = {};
 
+    void loadHighScores();
+    void saveHighScores();
+
     class HighscoreScene : public Scene
     {
         public:
@@ -47,7 +50,7 @@ namespace Runtime
 
 
                 banner = "Too Bad.\nYou have no place\non the leaderboard.";
-                if (position  <= display_amount) {
+                if (position <= display_amount && score != 0) {
                     std::string suffix = "th";
                     switch (position % 10) {
                         case 1: suffix = "st"; break;
@@ -63,8 +66,8 @@ namespace Runtime
             void update_fixed();
             void draw();
         
-        
-        
+        int red_ticks = 0;
+        bool enter_locked = false;
         char change_char = 0;
         std::string banner;
         decltype(high_scores)::iterator change_it = high_scores.end();
