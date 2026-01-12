@@ -62,6 +62,7 @@ namespace Runtime {
             struct PacMan : public Entity::Entity, public virtual IKillable {
                 PacMan() {
                     pacman_texture = ARCADE_LOADTEXTROM(IMGpacman);
+                    current_accessory = accessory_t((std::rand() % 4) - 1); // [-1, 3]
                     registerComponent<PacComponent>();
                 }
 
@@ -73,6 +74,15 @@ namespace Runtime {
                 void kill();
 
                 Graphics::shared_texture pacman_texture = nullptr;
+                enum accessory_t {
+                    pacman_accessory_none = -1,
+                    pacman_accessory_angrybrow = 0,
+                    pacman_accessory_bowtie,
+                    pacman_accessory_tophat,
+                } current_accessory = pacman_accessory_none;
+
+
+
                 Runtime::duration time_elasped = Runtime::duration::zero();
                 Runtime::Pac::PACDirection m_direction_buffer = PACDirection::LAST;
 

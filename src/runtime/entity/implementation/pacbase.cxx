@@ -72,10 +72,18 @@ namespace Runtime {
             auto pac = getComponent<PacComponent>();
             auto tilemap = pac->getTileMap();
 
-            if (fireball_count <= 0)
-                fire_man_timer -= Runtime::tick_length;
+            if (Controls::button_inputs[Controls::BUTTON_SELECT]) 
+            {
+                Runtime::live_count = 0;
+                kill();
+            }
+                
+
             bool new_fire_ball_input = Controls::button_inputs[Controls::BUTTON_B].load();
             if (fire_man_timer.count() > 0) {
+                if (fireball_count <= 0 && fire_man_timer.count() > 0)
+                    fire_man_timer -= Runtime::tick_length;
+
                 if (!new_fire_ball_input && fire_ball_input && fireball_count > 0) {
                     fireball_count -= 1;
                     getManager()->addEntity<FireBall>(
@@ -200,8 +208,58 @@ namespace Runtime {
             }
                 
             else SDL_SetTextureColorMod(pacman_texture.get(), 255, 255, 0);
+            SDL_RendererFlip flip;
+            if (pac->m_direction == PACDirection::LEFT) {
+                flip = SDL_FLIP_HORIZONTAL;
+                angle = 0;
+            }
+
             SDL_RenderCopyEx(Graphics::renderer, pacman_texture.get(), &src, &dst, 
-                angle, NULL, SDL_FLIP_NONE);
+                angle, NULL, flip);
+            
+            if (this->current_accessory != PacMan::pacman_accessory_none && !dead) {
+                float accessory_angle = angle;
+                auto up_dir = Math::pointi(0, 0);
+                switch (pac->m_direction) {
+                    case PACDirection::RIGHT:   up_dir = Math::pointi(0, -1);
+                    case PACDirection::UP:      up_dir = Math::pointi(-1, 0);
+                    case PACDirection::DOWN:    up_dir = Math::pointi(1, 0);
+                    case PACDirection::LEFT:    up_dir = Math::pointi(0, -1);
+                }
+
+
+
+                SDL_Rect accessory_src;
+                SDL_Rect accessory_dst = dst;
+                switch (this->current_accessory) {
+                    case PacMan::pacman_accessory_angrybrow:
+                        accessory_src = {0, 16, 16, 16};
+                        accessory_dst.y += frame*up_dir.y*2;
+                        
+                        break;
+                    case PacMan::pacman_accessory_tophat:
+                        accessory_src = {16, 16, 16, 16};
+                        break;
+                    case PacMan::pacman_accessory_bowtie:
+                        accessory_src = {32, 16, 16, 16};
+                        break;
+                }
+                SDL_RendererFlip accessory_flip = SDL_FLIP_NONE;
+                if (pac->m_direction == PACDirection::LEFT) {
+                    accessory_flip = SDL_FLIP_HORIZONTAL;
+                    accessory_angle = 0;
+                    
+                }
+
+
+                SDL_SetTextureColorMod(pacman_texture.get(), 255, 255, 255);
+                SDL_RenderCopyEx(Graphics::renderer, pacman_texture.get(), &accessory_src, &accessory_dst, 
+                    accessory_angle, NULL, accessory_flip);
+
+            }
+            
+
+
         }
         FireBall::FireBall(Math::pointi pos, Pac::PACDirection dir) {
             collectables_texture = ARCADE_LOADTEXTROM(IMGmazeCollectables);
