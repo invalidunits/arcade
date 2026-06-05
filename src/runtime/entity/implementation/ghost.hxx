@@ -41,8 +41,8 @@ namespace Runtime {
                     Runtime::duration scatter_time,
                     Runtime::duration chase_time,
                     movement_behavior_array behavior,
-                    bool (*angry_behaviour)(GhostComponent*self) = no_anger
-                    ): Entity::Component(entity), m_behaviors(behavior), m_scatter_time(scatter_time), m_chase_time(chase_time), angry_behaviour(angry_behaviour) {
+                    std::function<bool(GhostComponent*)> angry_behavior = no_anger
+                    ): Entity::Component(entity), m_behaviors(behavior), m_scatter_time(scatter_time), m_chase_time(chase_time), m_angry_behaviour(angry_behavior) {
                         state_timer = m_scatter_time;
                     }
 
@@ -65,7 +65,7 @@ namespace Runtime {
                 Pac::movement_tile target_tile = {0, 0};
 
                 const movement_behavior_array m_behaviors;
-                bool (*angry_behaviour)(GhostComponent*self);
+                std::function<bool(GhostComponent*)> m_angry_behaviour;
                 static bool no_anger(GhostComponent *self) { return false; }
 
                 const Runtime::duration m_scatter_time;
@@ -178,7 +178,7 @@ namespace Runtime {
                             auto friends = comp->getEntity()->getManager()->getEntitysFromID(best_friend);
                             auto best_friend = friends[0];
                             auto best_friend_ghost = best_friend->getComponent<GhostComponent>();
-                            if (best_friend_ghost->angry_behaviour(best_friend_ghost) && level > 6) 
+                            if (best_friend_ghost->m_angry_behaviour(best_friend_ghost) && level > 6) 
                             {
                                 return true;
                             }

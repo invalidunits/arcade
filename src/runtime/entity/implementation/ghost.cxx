@@ -76,7 +76,7 @@ namespace Runtime {
                 if (state_timer.count() < 0) {
                     switch (state) {
                         default:
-                            if (angry_behaviour(this)) goto be_angry;
+                            if (m_angry_behaviour(this)) goto be_angry;
                             state = STATE_SCATTER;
                             pac->m_direction = dfromv(Math::pointi{0, 0}-vfromd(pac->m_direction));
                             state_timer = m_scatter_time;
@@ -161,7 +161,7 @@ namespace Runtime {
                 if (ghost->state == STATE_SCARED) {  
                     src = {(9 + (scared_frame % 2))*ghost_width, 0, ghost_width, ghost_height};
                     SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
-                    if (ghost->angry_behaviour(ghost))
+                    if (ghost->m_angry_behaviour(ghost))
                     {
                         src = {(14 + (scared_frame % 2))*ghost_width, 0, ghost_width, ghost_height};;
                         SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
@@ -184,7 +184,7 @@ namespace Runtime {
 
                     src = {ghost_width*(eyeframe + 6), 0, ghost_width, ghost_height};
                     SDL_RenderCopyEx(Graphics::renderer, texture.get(), &src, &dst, 0, NULL, eyefliped);
-                    if (ghost->angry_behaviour(ghost))
+                    if (ghost->m_angry_behaviour(ghost))
                     {
                         src = {ghost_width*(eyeframe + 11), 0, ghost_width, ghost_height};
                         SDL_RenderCopyEx(Graphics::renderer, texture.get(), &src, &dst, 0, NULL, eyefliped);

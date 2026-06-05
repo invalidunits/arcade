@@ -39,7 +39,7 @@ namespace Runtime
         if (change_it != high_scores.end()) {
             Graphics::drawText({0, ARCADE_LOGIC_HEIGHT-50, 0, 0}, "Press Z to confirm your name.", Graphics::renderer);
         } else {
-            Graphics::drawText({0, ARCADE_LOGIC_HEIGHT-20, 0, 0}, "Press B to return to the Main Menu.", Graphics::renderer);
+            Graphics::drawText({0, ARCADE_LOGIC_HEIGHT-20, 0, 0}, "Press B.", Graphics::renderer);
         }
     }
 
