@@ -31,7 +31,7 @@ namespace Runtime {
 
     namespace SceneManager {
         inline std::vector<Math::UUID> scene_stack = {};
-        inline std::map<Math::UUID, std::unique_ptr<Scene>> scene_map = {};   
+        inline std::unordered_map<Math::UUID, std::unique_ptr<Scene>> scene_map = {};   
        
 
 
@@ -39,7 +39,7 @@ namespace Runtime {
             static_assert(std::is_base_of_v<Scene, T>, "Type must be scene for it to be registered.");
 
             if (scene_map.find(Math::getUUID<T>()) == scene_map.end()) {
-                scene_map.insert_or_assign(Math::getUUID<T>(), std::make_unique<T>());
+                scene_map.try_emplace(Math::getUUID<T>(), std::unique_ptr<Scene>(dynamic_cast<Scene*>(new T())));
             }
 
             return Math::getUUID<T>();

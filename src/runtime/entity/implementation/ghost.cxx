@@ -76,12 +76,14 @@ namespace Runtime {
                 if (state_timer.count() < 0) {
                     switch (state) {
                         default:
+                            if (angry_behaviour(this)) goto be_angry;
                             state = STATE_SCATTER;
                             pac->m_direction = dfromv(Math::pointi{0, 0}-vfromd(pac->m_direction));
                             state_timer = m_scatter_time;
                             break;
                         
                         case STATE_SCATTER:
+                            be_angry:
                             state = STATE_CHASE;
                             pac->m_direction = dfromv(Math::pointi{0, 0}-vfromd(pac->m_direction));
                             state_timer = m_chase_time;
@@ -97,14 +99,13 @@ namespace Runtime {
                     auto pacman = static_cast<Pac::PacMan*>(pacmen[0]);
                     auto pacman_pac = pacman->getComponent<Pac::PacComponent>();
                     auto dist_squared = std::pow(pacman_pac->m_position.x - pac->m_position.x, 2) + std::pow(pacman_pac->m_position.y - pac->m_position.y, 2);
-                    if (dist_squared < std::pow(4, 2)) {
+                    if (dist_squared < 16) {
                         if (state == STATE_CHASE || state == STATE_SCATTER)
                             pacman->kill();
                         else if (state == STATE_SCARED) {
                             killGhost();
                             return;
                         }
-                            
                     }
                 }        
 
@@ -157,7 +158,17 @@ namespace Runtime {
 
                 dontrenderbody:
 
-                if (ghost->state != STATE_SCARED) {  
+                if (ghost->state == STATE_SCARED) {  
+                    src = {(9 + (scared_frame % 2))*ghost_width, 0, ghost_width, ghost_height};
+                    SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
+                    if (ghost->angry_behaviour(ghost))
+                    {
+                        src = {(14 + (scared_frame % 2))*ghost_width, 0, ghost_width, ghost_height};;
+                        SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
+                    }
+                } 
+                else 
+                {
                     int eyeframe = 0;
                     SDL_RendererFlip eyefliped = SDL_RendererFlip::SDL_FLIP_NONE;
                     switch (pac->m_direction) {
@@ -170,11 +181,14 @@ namespace Runtime {
                         case Pac::PACDirection::DOWN:
                             eyeframe = 2; break;
                     }
+
                     src = {ghost_width*(eyeframe + 6), 0, ghost_width, ghost_height};
                     SDL_RenderCopyEx(Graphics::renderer, texture.get(), &src, &dst, 0, NULL, eyefliped);
-                } else if (ghost->state == STATE_SCARED) {
-                    src = {(9 + (scared_frame % 2))*ghost_width, 0, ghost_width, ghost_height};
-                    SDL_RenderCopy(Graphics::renderer, texture.get(), &src, &dst);
+                    if (ghost->angry_behaviour(ghost))
+                    {
+                        src = {ghost_width*(eyeframe + 11), 0, ghost_width, ghost_height};
+                        SDL_RenderCopyEx(Graphics::renderer, texture.get(), &src, &dst, 0, NULL, eyefliped);
+                    }
                 }
             }
             movement_tile scaredBehavior(Runtime::Pac::Ghost::GhostComponent *comp) {

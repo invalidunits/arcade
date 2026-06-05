@@ -11,23 +11,25 @@ std::optional<std::vector<Runtime::Pac::PACPellet>> save_pellets = {};
 
 namespace Runtime {
     void Gameplay::setup() {
+        fruit_spawner_timer = std::chrono::seconds(30);
         
         Runtime::Sound::SoundEffect<ROM::gSFXBeginData>::StartSound();
-
+        Runtime::Pac::Tilemap *tilemap;
         if (level % 2 == 0) {
-            addEntity<Runtime::Pac::Tilemap>(
+            tilemap = addEntity<Runtime::Pac::Tilemap>(
                 ARCADE_LOADTEXTROM(IMGmaze1),
                 ARCADE_LOADSURFROM(IMGmaze1Collision)
             );
         } else {
-            addEntity<Runtime::Pac::Tilemap>(
+            tilemap = addEntity<Runtime::Pac::Tilemap>(
                 ARCADE_LOADTEXTROM(IMGmaze),
                 ARCADE_LOADSURFROM(IMGmazeCollision)
             );
         }
 
-        auto tilemap = static_cast<Runtime::Pac::Tilemap*>(getEntitysFromID("Tilemap")[0]);
+        // auto tilemap = static_cast<Runtime::Pac::Tilemap*>(getEntitysFromID("Tilemap")[0]);
         tilemap->position = {0, 18};
+        fruit_pos = tilemap->position + Math::pointi{112, 188};
 
         auto pacman =   addEntity<Runtime::Pac::PacMan>();
         pacman->getComponent<Runtime::Pac::PacComponent>()->m_position = tilemap->position + Math::pointi{112, 188};
@@ -184,7 +186,33 @@ namespace Runtime {
         release_yield_frame:
 
         
-
+        if (has_fruit)
+        {
+            auto pac = getEntitysFromID("PacMan")[0]->getComponent<Pac::PacComponent>();
+            auto dist_to_fruit_squared = std::pow(fruit_pos.x - pac->m_position.x, 2) + std::pow(fruit_pos.y - pac->m_position.y, 2);
+            if (dist_to_fruit_squared < 16) {
+                
+                Runtime::Sound::SoundEffect<ROM::gSFXeatGhostData>::StartSound();
+                addEntity<PointsEffect>(pac->m_position, 1000);
+                Runtime::current_score += 1000;  
+                addEntityDelay(Runtime::tick_length*20);
+                has_fruit = false;
+                eaten_fruit = true;
+            }
+        }
+        
+        if (!eaten_fruit)
+        {
+            fruit_spawner_timer -= tick_length;
+            if (fruit_spawner_timer.count() < 0)
+            {
+                has_fruit = !has_fruit;
+                fruit_spawner_timer += has_fruit? std::chrono::seconds(15) : std::chrono::seconds(30);
+            }
+        }
+        
+        
+            
 
         EntityManager::update_fixed();
         fixedupdateCounter();
@@ -192,7 +220,18 @@ namespace Runtime {
 
     void Gameplay::draw() {
         auto tilemap = (Runtime::Pac::Tilemap *)getEntitysFromID("Tilemap")[0];
+
+        bool fruit_blinking = ((Runtime::current_tick / 6) % 2 == 0) && fruit_spawner_timer < std::chrono::seconds(5);
         
+        if (has_fruit && !fruit_blinking)
+        {
+            auto tex = tilemap->collectables_texture;
+            const auto pos = fruit_pos;
+            const auto dst = SDL_Rect{pos.x - 8, pos.y - 8, 16, 16};
+            const auto src = SDL_Rect{0, 8, 16, 16};
+            SDL_RenderCopy(Graphics::renderer, tex.get(), &src, &dst);
+        }
+
         if (!flags[7] && !game_over)
             EntityManager::draw();
         else {

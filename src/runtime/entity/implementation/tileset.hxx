@@ -43,7 +43,7 @@ namespace Runtime {
             none,
             regular,
             super,
-            fire_super
+            fire_super,
         };
 
 

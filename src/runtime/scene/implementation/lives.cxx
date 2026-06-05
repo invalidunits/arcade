@@ -4,18 +4,28 @@
 
 namespace Runtime {
     LiveCutscene::LiveCutscene() {
-        pacmen_cutscene =  ARCADE_LOADTEXTROM(IMGpacmanCutscene);
-        
+    }
+    
+    void LiveCutscene::update_pac(pac_t *pac)
+    {
+        IntermissionBase::update_pac(pac);
+        if (!pac->evaluated) {
+            if ((pac->time_elapsed.count()/(float)pac->life_time.count()) > 0.5) {
+                coin_display -= life_value;
+                pac->evaluated = true;
+                
+                std::printf("%d", int(pac->sprite));
+            }
+        }
     }
 
     void LiveCutscene::setup() {
-
+        Entity::EntityManager::setup();
+        IntermissionBase::setup();
         Runtime::display_coins = false;
-        Runtime::Entity::EntityManager::setup();
         level = 1;
         Runtime::_current_score = 0;
         Runtime::current_score = 0;
-        pacmen = {};
         live_count = coin_display/life_value;
         int next_special_char = 4;
         m_state = 0;
@@ -24,7 +34,7 @@ namespace Runtime {
         Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSoundMS((live_count/10) + 1);
         for (int i = 0; i < live_count; i++) {
             std::srand(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-            pacmen.push_back(pac_t());
+            pacmen.push_back(IntermissionBase::pac_t());
             pac_t &pac = pacmen.back();
             pac.sprite = pac_t::pacman;
             pac.random = ((float)std::rand()) / RAND_MAX;
@@ -39,7 +49,7 @@ namespace Runtime {
             pac.life_time = default_life_time;
 
             if (i > 4) {
-                pac.time_elapsed -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(250*pac.random)));
+                pac.time_elapsed -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(250*((float)std::rand()) / RAND_MAX)));
                 pac.life_time -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(2500*((float)std::rand()) / RAND_MAX)));
             }
 
@@ -56,28 +66,8 @@ namespace Runtime {
     }
 
     void LiveCutscene::update() {
-        
-        Runtime::Entity::EntityManager::update();
-        for (auto it = pacmen.begin(); it != pacmen.end();) {
-            auto &pac = *it;
-            pac.time_elapsed += Runtime::delta_time;
-            if (!pac.evaluated) {
-                if ((pac.time_elapsed.count()/(float)pac.life_time.count()) > 0.5) {
-                    coin_display -= life_value;
-                    pac.evaluated = true;
-                    
-                    std::printf("%d", int(pac.sprite));
-                }
-            }
-
-            if (pac.time_elapsed > pac.life_time) {
-                pacmen.erase(it);
-            } else {
-                ++it;
-            }
-        }
-
-
+        Entity::EntityManager::update();
+        IntermissionBase::update();
         if (pacmen.size() == 0) {
             m_do_stuff_timer -= Runtime::delta_time;
             if (m_do_stuff_timer.count()) {
@@ -104,23 +94,15 @@ namespace Runtime {
                             Runtime::SceneManager::gotoScene<Runtime::Gameplay>();
                         }
                     }
-                    else
-                    {
-                        
-                    }
-                    
                 }
-                
-                //TODO: A point particle effect
             }
-
-
         }
     }
 
     void LiveCutscene::update_fixed() {
+        Entity::EntityManager::update_fixed();
         Runtime::fixedupdateCounter();
-        Runtime::Entity::EntityManager::update_fixed();
+        
         if (coin_display != _coin_display)
             coin_update_frame = 3;
             _coin_display = coin_display;
@@ -132,7 +114,8 @@ namespace Runtime {
     }
 
     void LiveCutscene::draw() {
-        Runtime::Entity::EntityManager::draw();
+        Entity::EntityManager::draw();
+        IntermissionBase::draw();
         int cointrans = 0;
         switch (coin_update_frame) {
             case 3: cointrans = 1; break;
@@ -155,55 +138,12 @@ namespace Runtime {
                 Math::to_string_with_precision(live_count, 0) + " Lives Total",
                 Graphics::renderer, color, true);
         }
-        for (auto &pac: pacmen) {
-            SDL_Rect src = { 0, 0, 16, 16 }, dst = { 0 };
-            
-            unsigned char frame_count = 3;
-            int frame = 0;
-            unsigned int tick = (pac.time_elapsed/Runtime::tick_length);
-            switch (pac.sprite) {
-                
-                case pac_t::legman:
-                    frame_count = 4;
-                    src = {0, 48, 16, 16};
-                    goto pac_frame_logic;
-                case pac_t::kidman:
-                    src = {0, 64, 16, 16};
-                    goto pac_frame_logic;
-                case pac_t::woman:
-                    src = {48, 0, 16, 16};
-                    goto pac_frame_logic;
-                case pac_t::pacman:
-                    pac_frame_logic:
-                        frame = (tick/3 + int(pac.random*100) % 4)% frame_count;
-                        src.x += frame*src.w;
-                    break;
-                
-                case pac_t::smugman: 
-                        frame_count = 8;
-                        src = {96, 0, 48, 32};
-                        frame = (tick/3 + int(pac.random*100) % 4)% frame_count;
-                        src.x += (frame % 4)*src.w;
-                        src.y += int(frame > 4)*src.h;
-                    break;
-                case pac_t::largeman: 
-                        src = {0, 16, 32, 32};
-                        goto pac_frame_logic;
-            }
-
-            int dist = int((pac.time_elapsed.count()/(float)pac.life_time.count())*ARCADE_LOGIC_WIDTH); 
-            dst = {dist, ARCADE_LOGIC_HEIGHT/2 + 25 -src.h, src.w, src.h};
-            SDL_RenderCopy(Graphics::renderer, pacmen_cutscene.get(), &src, &dst);
-
-
-
-        }
-        
 
         Runtime::drawCounter();
     }
 
     void LiveCutscene::cleanup() {
+        Entity::EntityManager::cleanup();
         Runtime::display_coins = false;
     }
 

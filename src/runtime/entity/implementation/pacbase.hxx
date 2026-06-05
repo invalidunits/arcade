@@ -29,7 +29,7 @@ namespace Runtime {
                 inline Runtime::Pac::Tilemap *getTileMap() const {
                     auto tilemaps = m_entity->getManager()->getEntitysFromID("Tilemap");
                     if (tilemaps.size() <= 0) return nullptr;
-                    return (Runtime::Pac::Tilemap*)tilemaps.front();;
+                    return (Runtime::Pac::Tilemap*)tilemaps.front();
                 }
 
 

@@ -40,8 +40,9 @@ namespace Runtime {
                 GhostComponent(Entity::Entity *entity,
                     Runtime::duration scatter_time,
                     Runtime::duration chase_time,
-                    movement_behavior_array behavior
-                    ): Entity::Component(entity), m_behaviors(behavior), m_scatter_time(scatter_time), m_chase_time(chase_time) {
+                    movement_behavior_array behavior,
+                    bool (*angry_behaviour)(GhostComponent*self) = no_anger
+                    ): Entity::Component(entity), m_behaviors(behavior), m_scatter_time(scatter_time), m_chase_time(chase_time), angry_behaviour(angry_behaviour) {
                         state_timer = m_scatter_time;
                     }
 
@@ -64,6 +65,9 @@ namespace Runtime {
                 Pac::movement_tile target_tile = {0, 0};
 
                 const movement_behavior_array m_behaviors;
+                bool (*angry_behaviour)(GhostComponent*self);
+                static bool no_anger(GhostComponent *self) { return false; }
+
                 const Runtime::duration m_scatter_time;
                 const Runtime::duration m_chase_time;
 
@@ -90,8 +94,8 @@ namespace Runtime {
                     texture = ARCADE_LOADTEXTROM(IMGghostBlinky);
                     registerComponent<PacComponent>();
                     registerComponent<GhostComponent>(
-                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)),
-                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(30)),
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)) - std::min(std::chrono::seconds(level / 4), std::chrono::seconds(6)),
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(20)) + std::min(std::chrono::seconds(level / 4), std::chrono::seconds(10)),
                         movement_behavior_array{
                             // Scatter
                             [](GhostComponent *comp) {
@@ -113,6 +117,14 @@ namespace Runtime {
                         }
                     );
                 }
+
+                static bool angry_behavior(GhostComponent *self) 
+                { 
+                    PacComponent *pac = self->getEntity()->getComponent<PacComponent>();
+                    auto amount_left = std::count(pac->getTileMap()->pellets.begin(), pac->getTileMap()->pellets.end(), Runtime::Pac::PACPellet::regular);
+                    auto amount = std::count(pac->getTileMap()->pellets.begin(), pac->getTileMap()->pellets.end(), Runtime::Pac::PACPellet::none) + amount_left;
+                    return amount_left < (amount/2);
+                }
             };
 
             struct Inky : Ghost {
@@ -125,8 +137,8 @@ namespace Runtime {
                     registerComponent<PacComponent>();
                     registerComponent<GhostComponent>(
                         // Inky's always chasing when Red's out.
-                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(10)),
-                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(99999999)),
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(16)),
+                        std::chrono::duration_cast<Runtime::duration>(std::chrono::seconds(30)),
                         movement_behavior_array{
                             // Scatter
                             [](GhostComponent *comp) {
@@ -158,6 +170,18 @@ namespace Runtime {
                             },
                             scaredBehavior,
                             retreatBehavior
+                        },
+
+                        // angry behavior
+                        [this](GhostComponent *comp)
+                        {
+                            auto friends = comp->getEntity()->getManager()->getEntitysFromID(best_friend);
+                            auto best_friend = friends[0];
+                            auto best_friend_ghost = best_friend->getComponent<GhostComponent>();
+                            if (best_friend_ghost->angry_behaviour(best_friend_ghost) && level > 6) 
+                            {
+                                return true;
+                            }
                         }
                     );
                 }
@@ -234,6 +258,13 @@ namespace Runtime {
                             },
                             scaredBehavior,
                             retreatBehavior
+                        },
+
+
+                        // angry behavior
+                        [](GhostComponent *comp)
+                        {
+                            return level > 8;
                         }
                     );
                 }

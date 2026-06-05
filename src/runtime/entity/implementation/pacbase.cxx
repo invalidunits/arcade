@@ -77,8 +77,6 @@ namespace Runtime {
                 Runtime::live_count = 0;
                 kill();
             }
-                
-
             bool new_fire_ball_input = Controls::button_inputs[Controls::BUTTON_B].load();
             if (fire_man_timer.count() > 0) {
                 if (fireball_count <= 0 && fire_man_timer.count() > 0)

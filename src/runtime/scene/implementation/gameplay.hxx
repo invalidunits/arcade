@@ -28,6 +28,14 @@ namespace Runtime {
         std::vector<Runtime::Pac::Ghost::Ghost*> ghosts = {};
         std::vector<Runtime::Pac::Ghost::Ghost*> inactive_ghosts = {};
         Runtime::duration clock_delay = decltype(clock_delay)::zero();
+
+
+        Runtime::duration fruit_spawner_timer = decltype(clock_delay)::zero();
+        bool has_fruit;
+        bool eaten_fruit;
+        Math::pointi fruit_pos;
+
+
         int ghost_released = 0;
         bool game_over = false;
     };
