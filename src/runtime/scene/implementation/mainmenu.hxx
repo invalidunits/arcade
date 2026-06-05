@@ -27,7 +27,7 @@ namespace Runtime {
 
         int coin_update_frame = 0;
         bool first_ready = false;
-
+        int start = 0;
 
         public: 
             MainMenu();

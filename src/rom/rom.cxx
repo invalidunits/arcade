@@ -47,4 +47,8 @@ extern "C" {
 	INCBIN(SFXSirin3, "rom/sfx/siren_3.wav");
 	INCBIN(SFXSirin4, "rom/sfx/siren_4.wav");
 	INCBIN(SFXSirin5, "rom/sfx/siren_5.wav");
+
+	INCBIN(SFXSelect, "rom/sfx/select.wav");
+	INCBIN(SFXCoin, "rom/sfx/select.wav");
+	INCBIN(SFXError, "rom/sfx/select.wav");
 }

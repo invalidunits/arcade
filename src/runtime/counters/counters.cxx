@@ -1,6 +1,7 @@
 #include "counters.hxx"
 
 #include <rom/rom.hxx>
+#include <sfx/sfx.hxx>
 #include <system/com.hxx>
 #include <system/clock.hxx>
 
@@ -17,14 +18,29 @@ namespace Runtime {
     }
 
     void fixedupdateCounter() {
+        if (current_score != _current_score)
+        {
+            constexpr int points_to_life = 10000;
+            int lives_owed = current_score / points_to_life;
+            int lives_recieved = _current_score / points_to_life;
+            if (lives_owed > lives_recieved)
+            {
+                live_count += lives_owed - lives_recieved;
+                Runtime::Sound::SoundEffect<ROM::gSFXextraPacData>::StartSound();
+            }
+
+            _current_score = current_score;
+        }
+
         if (current_score > high_score) {
             high_score = current_score;
         }
 
 
-        coin_display += (float)COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed);
+        coin_display += COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed);
         if (_coin_display != coin_display) {
             _coin_display = coin_display;
+            Sound::SoundEffect<ROM::gSFXCoinData>::StartSound();
             coin_update_frame = 3;
         }
         
@@ -48,11 +64,11 @@ namespace Runtime {
                                     Math::color8a(~0, ~0, ~0, ~0) : 
                                     Math::color8a(~0, ~0, 0, ~0));
 
-            if (Runtime::coin_display > 1000) 
-                Graphics::drawText(coindraw, "STOP IT!",
-                        Graphics::renderer, color);
-            else if (Runtime::coin_display > 8000) 
-                Graphics::drawText(coindraw, "Too much...",
+            if (Runtime::coin_display > 2000) 
+                Graphics::drawText(coindraw, "STOP IT!!!",
+                        Graphics::renderer, Graphics::rgbColor(Runtime::current_tick));
+            else if (Runtime::coin_display > 1000) 
+                Graphics::drawText(coindraw, "That's enough...",
                         Graphics::renderer, color);
             else Graphics::drawText(coindraw, std::string("$") + std::string(Math::to_string_with_precision(float(coin_display*coin_display_multiplier), 2)),
                         Graphics::renderer, color);
@@ -65,26 +81,13 @@ namespace Runtime {
         Graphics::drawText(livedst, "x" + Math::to_string_with_precision(live_count, 0),
                 Graphics::renderer); 
         
-        Math::color8a highcolor = Math::color8a(~0, ~0, ~0, ~0);
-        if (current_score == high_score && high_score != 0) {
-            switch ((Runtime::current_tick/6) % 5)
-            {
-            case 0: highcolor = Math::color8a(~0, 0, 0, ~0); break;
-            case 1: highcolor = Math::color8a(~0, ~0, 0, ~0); break;
-            case 2: highcolor = Math::color8a(0,   ~0, 0, ~0); break;
-            case 3: highcolor = Math::color8a(0, ~0, ~0, ~0); break;
-            case 4: highcolor = Math::color8a(0, 0,  ~0, ~0); break;
-            case 5: highcolor = Math::color8a(~0, 0,  ~0, ~0); break;
-
-            
-            default:
-                break;
-            }
-        }
+        Math::color8a high_color = Math::color8a(~0, ~0, ~0, ~0);
+        if (current_score == high_score && high_score != 0) 
+            high_color = Graphics::rgbColor(Runtime::current_tick);
 
         auto pointdst = Math::recti(68, 8, 0, 0);
         Graphics::drawText(pointdst, Math::to_string_with_zero_pad(current_score, 5),
-                Graphics::renderer, highcolor);
+                Graphics::renderer, high_color);
 
         auto highdst = Math::recti(158, 8, 0, 0);
         Graphics::drawText(highdst, Math::to_string_with_zero_pad(high_score, 5),

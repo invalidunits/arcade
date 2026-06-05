@@ -48,8 +48,13 @@ namespace Graphics {
         return lines;
     }
 
-
-
+    Math::pointi drawTextDimensions(std::string_view text, TTF_Font *font)
+    {
+        Math::pointi dim;
+        std::vector<std::string> string_lines = splitIntoLines(text);
+        if (TTF_SizeText(font, string_lines[0].c_str(), &dim.w, &dim.h)) throw sdl_exception();
+        return dim;
+    }
     void drawText(Math::recti bounds, std::string_view text, SDL_Renderer *renderer,
         Math::color8a color, bool center, TTF_Font *font) {
         int err = 0;
@@ -148,5 +153,21 @@ namespace Graphics {
         return ret;
     }
 
+
+    Math::color8a rgbColor(int tick)
+    {
+        switch ((tick/6) % 5)
+        {
+            case 0: return Math::color8a(~0, 0, 0, ~0); break;
+            case 1: return Math::color8a(~0, ~0, 0, ~0); break;
+            case 2: return Math::color8a(0,   ~0, 0, ~0); break;
+            case 3: return Math::color8a(0, ~0, ~0, ~0); break;
+            case 4: return Math::color8a(0, 0,  ~0, ~0); break;
+            case 5: return Math::color8a(~0, 0,  ~0, ~0); break;
+            default:
+                break;
+        }
+        return Math::color8a(~0, ~0, ~0, ~0);
+    }
 
 }

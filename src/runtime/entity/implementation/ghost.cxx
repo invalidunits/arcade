@@ -72,8 +72,7 @@ namespace Runtime {
 
                 pac->moving = true;
 
-                if (state != STATE_SCARED)
-                    state_timer -= Runtime::tick_length;
+                state_timer -= Runtime::tick_length;
                 if (state_timer.count() < 0) {
                     switch (state) {
                         default:
@@ -205,6 +204,6 @@ void ateSuper(Runtime::Entity::EntityManager *manager) {
         if (ghost->state >= Runtime::Pac::Ghost::STATE_LAST) continue;
 
         ghost->state = Runtime::Pac::Ghost::STATE_SCARED;
-        ghost->state_timer = ghost->m_scatter_time;
+        ghost->state_timer = std::chrono::seconds(16);
     }
 }

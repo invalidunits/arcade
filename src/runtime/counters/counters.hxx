@@ -68,6 +68,7 @@ namespace Runtime {
 
 
     inline uint32_t high_score = 0;
+    inline uint32_t _current_score = 0;
     inline uint32_t current_score = 0;
     inline unsigned short level = 0;
 

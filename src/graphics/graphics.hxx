@@ -38,8 +38,11 @@ namespace Graphics {
     #define ARCADE_LOADSURFROM(rom) ::Graphics::loadSurface((void *)ROM::g ## rom ## Data, ROM::g ## rom ## Size, #rom) 
     #define ARCADE_LOADTEXTROM(rom) ::Graphics::loadTexture((void *)ROM::g ## rom ## Data, ROM::g ## rom ## Size, #rom)
 
+    Math::pointi drawTextDimensions(std::string_view text, TTF_Font *font);
     void drawText(Math::recti bounds, std::string_view text, SDL_Renderer *renderer,
         Math::color8a color = Math::color8a(~0, ~0, ~0, ~0), bool center = false, TTF_Font *font = nullptr);
+
+    Math::color8a rgbColor(int tick);
 }
 
 

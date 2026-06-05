@@ -4,6 +4,7 @@ namespace Runtime {
     void Intermission::setup() {
         flags = 0;
         pacmen = {};
+        Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSound();
     }
     void Intermission::update() {
         if(!flags[1]) {
@@ -16,9 +17,6 @@ namespace Runtime {
             pac.time_elapsed = -std::chrono::duration_cast<decltype(pac.time_elapsed)>(std::chrono::seconds(1));
             pac.life_time = Runtime::tick_length*ARCADE_LOGIC_WIDTH;
             pacmen.push_back(pac);
-
-            Runtime::Sound::SoundEffect<ROM::gSFXIntermissionData>::StartSound();
-
         }
         for (auto it = pacmen.begin(); it != pacmen.end();) {
             auto &pac = *it;
@@ -119,13 +117,13 @@ namespace Runtime {
             case 2:     suffix = "nd"; break;
             case 3:     suffix = "rd"; break;
             default:    suffix = "th"; break;
-
-
         }
+
+        if (level >= 11 && level <= 13) suffix = "th"; // teens man
 
         Graphics::drawText(Math::recti(ARCADE_LOGIC_WIDTH/2, ARCADE_LOGIC_HEIGHT/2 - 48, 0, 0), 
             Math::to_string_with_precision(level, 0) + suffix + " Level", 
-            Graphics::renderer);
+            Graphics::renderer, Math::color8a(~0, ~0, ~0, ~0), true);
 
         Runtime::display_coins = false;
         Runtime::drawCounter();

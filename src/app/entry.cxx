@@ -42,7 +42,7 @@ void CreateRenderTarget(orientation orient, int width, int height) {
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     TTF_Init();
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048);
 
     int err = SDL_CreateWindowAndRenderer(ARCADE_WINDOW_WIDTH, ARCADE_WINDOW_HEIGHT, ARCADE_WINDOW_PROPERTIES,
         &window, &renderer);
@@ -91,6 +91,10 @@ int main(int argc, char *argv[]) {
     Runtime::Sound::SoundEffect<ROM::gSFXSirin3Data>::InitializeSFX(ROM::gSFXSirin3Size);
     Runtime::Sound::SoundEffect<ROM::gSFXSirin4Data>::InitializeSFX(ROM::gSFXSirin4Size);
     Runtime::Sound::SoundEffect<ROM::gSFXSirin5Data>::InitializeSFX(ROM::gSFXSirin5Size);
+
+    Runtime::Sound::SoundEffect<ROM::gSFXCoinData>::InitializeSFX(ROM::gSFXCoinSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXSelectData>::InitializeSFX(ROM::gSFXSelectSize);
+    Runtime::Sound::SoundEffect<ROM::gSFXErrorData>::InitializeSFX(ROM::gSFXErrorSize);
     
     for (;;) {
         if (render_target[current_orientation] == nullptr) {

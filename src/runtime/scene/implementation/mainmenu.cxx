@@ -9,6 +9,8 @@ namespace Runtime {
     }
 
     void MainMenu::setup() {
+        Runtime::loadHighScores();
+        Runtime::_current_score = 0;
         Runtime::current_score = 0;
         Runtime::coin_display = 0;
     }
@@ -32,7 +34,18 @@ namespace Runtime {
  
 
         if ((frame % 6) == 0) 
+        {
             coin_update_frame -= 1;
+            if (start > 0)
+            {
+                start -= 1;
+                if (start <= 0)
+                {
+                    Runtime::SceneManager::pushScene<Runtime::LiveCutscene>();
+                }
+            }
+        }
+            
         
         if ((frame % 16) == 0) {
             if (Controls::button_inputs[Controls::BUTTON_SELECT]) {
@@ -44,11 +57,12 @@ namespace Runtime {
 
         if ((frame % 16) == 0) {
             if (enter_coin) {
-                Runtime::coin_display += 5;
+                Runtime::coin_display += 25;
             }
 
-            if (start_button && can_start()) {
-                Runtime::SceneManager::pushScene<Runtime::LiveCutscene>();
+            if (start_button && can_start() && start <= 0) {
+                start = 30;
+                coin_update_frame = 3;
             }
         }
 
@@ -67,15 +81,26 @@ namespace Runtime {
         }
         SDL_RenderCopy(Graphics::renderer, main_menu.get(), nullptr, nullptr);
         
+        if (start > 0) {
+            auto color = Graphics::rgbColor(current_tick);
+            SDL_SetTextureColorMod(main_menu_start.get(), color.r, color.g, color.b);
+            SDL_SetTextureColorMod(main_menu_coin.get(), color.r, color.g, color.b);
+        } else SDL_SetTextureColorMod(main_menu_start.get(), 255, 184, 81);
+        
         if (!first_ready || cointrans != 0) {
             SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(coinframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
             SDL_Rect dstrect = {0, 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
-            if (first_ready && cointrans != 0) {
-                dstrect.y -= cointrans;
-                SDL_SetTextureColorMod(main_menu_coin.get(), 255, 0 , 0);
-            } else {
-                SDL_SetTextureColorMod(main_menu_coin.get(), 255, 255 , 255);
+
+            if (start > 0)
+            {
+                if (first_ready && cointrans != 0) {
+                    dstrect.y -= cointrans;
+                    SDL_SetTextureColorMod(main_menu_coin.get(), 255, 0 , 0);
+                } else {
+                    SDL_SetTextureColorMod(main_menu_coin.get(), 255, 255 , 255);
+                }
             }
+            
             
             SDL_RenderCopy(Graphics::renderer, main_menu_coin.get(), &rect, &dstrect);
         } else SDL_RenderCopy(Graphics::renderer, main_menu_start.get(), nullptr, nullptr);

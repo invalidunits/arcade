@@ -43,6 +43,10 @@ namespace ROM {
         INCBIN_EXTERN(SFXSirin3);
         INCBIN_EXTERN(SFXSirin4);
         INCBIN_EXTERN(SFXSirin5);
+
+        INCBIN_EXTERN(SFXSelect);
+	    INCBIN_EXTERN(SFXCoin);
+	    INCBIN_EXTERN(SFXError);
     }
 }
 

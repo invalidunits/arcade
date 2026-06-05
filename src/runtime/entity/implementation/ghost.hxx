@@ -228,7 +228,9 @@ namespace Runtime {
                                     if (distance <= std::pow(pacman_follow_distance, 4)) 
                                         return pac->getCurrentTile();
                                 }
-                                return (movement_tile)tilemap->tilemap_size/2;
+                                
+                                auto randomdir = (vfromd((PACDirection)(rand() % (int)PACDirection::LAST))*tile_size) + my_pac->getCurrentTile();
+                                return tilemap->getClosestTile(randomdir);
                             },
                             scaredBehavior,
                             retreatBehavior

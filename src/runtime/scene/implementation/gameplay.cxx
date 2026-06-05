@@ -159,7 +159,7 @@ namespace Runtime {
         }
 
        
-        printf("amount %d,", (int)amount);
+        // printf("amount %d,", (int)amount);
 
         
         

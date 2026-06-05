@@ -143,6 +143,7 @@ namespace Runtime {
                     
                     case Pac::PACPellet::fire_super:
                         Runtime::current_score += 100;
+                        getManager()->addEntityDelay(Runtime::tick_length*20);
                         getManager()->addEntity<PointsEffect>(pac->m_position, 100);
                         Runtime::Sound::SoundEffect<ROM::gSFXeatFruitData>::StartSound();
                         fire_man_timer = std::chrono::seconds(2);
