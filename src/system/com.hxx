@@ -4,6 +4,10 @@
 
 #include <atomic>
 
+#include "non_arcade.h"
+
+#ifndef NO_ARCADE
+
 namespace COM {
     inline std::atomic_uint16_t coin_inserted_value = 0;
     void beginCOMThread(void);
@@ -11,6 +15,7 @@ namespace COM {
 
 } // namespace COM
 
+#endif
 
 
 #endif // 

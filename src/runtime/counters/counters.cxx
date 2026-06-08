@@ -36,13 +36,14 @@ namespace Runtime {
             high_score = current_score;
         }
 
-
-        coin_display += COM::coin_inserted_value.exchange(0, std::memory_order::memory_order_relaxed);
+        #ifndef NO_ARCADE
+        coin_display += COM::coin_inserted_value.exchange(0, std::memory_order_acq_rel);
         if (_coin_display != coin_display) {
             _coin_display = coin_display;
             Sound::SoundEffect<ROM::gSFXCoinData>::StartSound();
             coin_update_frame = 3;
         }
+        #endif
         
         if (coin_update_frame > 0 && (Runtime::current_tick % 6) == 0)
             --coin_update_frame;

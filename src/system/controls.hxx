@@ -33,6 +33,7 @@ namespace Controls {
 
     void beginControlThread(void);
     void endControlThread(void);
+    void updateControls(void);
 } // namespace Runtime
 
 

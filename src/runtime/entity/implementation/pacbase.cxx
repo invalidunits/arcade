@@ -82,7 +82,7 @@ namespace Runtime {
                 if (fireball_count <= 0 && fire_man_timer.count() > 0)
                     fire_man_timer -= Runtime::tick_length;
 
-                if (!new_fire_ball_input && fire_ball_input && fireball_count > 0) {
+                if (!new_fire_ball_input && fire_ball_input && fireball_count > 0 && !pac->getTileMap()->isBlocked(pac->getNextTile())) {
                     fireball_count -= 1;
                     getManager()->addEntity<FireBall>(
                         tilemap->getTilePosition(pac->getNextTile()),
@@ -146,6 +146,9 @@ namespace Runtime {
                         Runtime::Sound::SoundEffect<ROM::gSFXeatFruitData>::StartSound();
                         fire_man_timer = std::chrono::seconds(2);
                         fireball_count = 3;
+                        break;
+                    
+                    default:
                         break;
                 }
 
@@ -224,6 +227,8 @@ namespace Runtime {
                     case PACDirection::UP:      up_dir = Math::pointi(-1, 0);
                     case PACDirection::DOWN:    up_dir = Math::pointi(1, 0);
                     case PACDirection::LEFT:    up_dir = Math::pointi(0, -1);
+                    default:
+                        break;;
                 }
 
 
@@ -242,12 +247,14 @@ namespace Runtime {
                     case PacMan::pacman_accessory_bowtie:
                         accessory_src = {32, 16, 16, 16};
                         break;
+                    default:
+                        break;
                 }
+
                 SDL_RendererFlip accessory_flip = SDL_FLIP_NONE;
                 if (pac->m_direction == PACDirection::LEFT) {
                     accessory_flip = SDL_FLIP_HORIZONTAL;
                     accessory_angle = 0;
-                    
                 }
 
 
@@ -288,14 +295,18 @@ namespace Runtime {
 
 
         void FireBall::update_fixed() {
+
             timeout_time -= Runtime::tick_length;
             if (timeout_time.count() < 0) {
                 queueFree();
             }
-            Entity::update_fixed();
 
             auto pac = getComponent<PacComponent>();
             auto tilemap = pac->getTileMap();
+
+            Entity::update_fixed();
+
+       
 
 
             for (auto &entity : *getManager()) {
@@ -316,7 +327,6 @@ namespace Runtime {
                     continue;
                 }
             }
-
 
             if (pac->atIntersection() ||  tilemap->isBlocked(pac->getNextTile())) {
                 auto position = pac->m_position;

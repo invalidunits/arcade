@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <system/math.hxx>
 #include <bitset>
+#include <unordered_map>
 
 #include <system/clock.hxx>
 #include <any>

@@ -28,6 +28,8 @@ namespace Runtime {
                 case PACDirection::UP:      return Math::pointi(0, -1);
                 case PACDirection::DOWN:    return Math::pointi(0, 1);
                 case PACDirection::LEFT:    return Math::pointi(-1, 0);
+                default:
+                    break;
             }
 
             return Math::pointi(0, 0);

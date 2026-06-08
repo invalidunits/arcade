@@ -78,6 +78,9 @@ namespace Runtime {
                     ghost = 2;
                 case pac_t::clyde:
                     ghost = 3;
+                
+                default:
+                    break;
             }
 
             int dist = int((pac.time_elapsed.count()/(float)pac.life_time.count())*ARCADE_LOGIC_WIDTH); 

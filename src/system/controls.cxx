@@ -36,35 +36,34 @@ SDL_Scancode keyboard_axis_bind[Controls::AXIS_END*2] = {
 };
 
 
+static void pollControls() {
+    for (unsigned char input = 0; input < Controls::AXIS_END; input++) {
+        int16_t value = 0;
+        if (SDL_GameControllerGetAttached(controller))
+            value += SDL_GameControllerGetAxis(controller, axis_bind[input]);
+
+        const Uint8 *key = SDL_GetKeyboardState(nullptr);
+        const ptrdiff_t key_input = input * 2;
+        value += (key[keyboard_axis_bind[key_input]] - key[keyboard_axis_bind[key_input + 1]]) * INT16_MAX;
+        Controls::axis_inputs[input].store(value);
+    }
+
+    for (unsigned char input = 0; input < Controls::BUTTON_END; input++) {
+        bool value = false;
+        if (SDL_GameControllerGetAttached(controller))
+            value = bool(SDL_GameControllerGetButton(controller, button_bind[input]));
+
+        const Uint8 *key = SDL_GetKeyboardState(nullptr);
+        value = value || key[keyboard_button_bind[input]];
+        Controls::button_inputs[input].store(value);
+    }
+}
+
 void controlLoop() {
     cancel_controls.store(false);
     while (!cancel_controls.load(std::memory_order_acquire)) {
-        if (!control_mutex.try_lock()) continue;
-        for (unsigned char input = 0; input < Controls::AXIS_END; input++) {
-            int16_t value = 0.0;
-            if (SDL_GameControllerGetAttached(controller)) 
-                value += SDL_GameControllerGetAxis(controller, axis_bind[input]);
-            
-            const Uint8 *key = SDL_GetKeyboardState(nullptr);
-            const ptrdiff_t key_input = input * 2;
-            value += (key[keyboard_axis_bind[key_input]] - key[keyboard_axis_bind[key_input + 1]])*INT16_MAX;
-            Controls::axis_inputs[input].store(value);
-        }
-
-        for (unsigned char input = 0; input < Controls::BUTTON_END; input++) {
-            bool value = false;
-            if (SDL_GameControllerGetAttached(controller)) 
-                value = bool(SDL_GameControllerGetButton(controller, button_bind[input]));
-            
-            const Uint8 *key = SDL_GetKeyboardState(nullptr);
-            value = value || key[keyboard_button_bind[input]];
-            Controls::button_inputs[input].store(value);
-        }
-
-
-
-        control_mutex.unlock();
-    }            
+        Controls::updateControls();
+    }
 }
 
 namespace Controls {
@@ -78,14 +77,31 @@ namespace Controls {
             std::printf("Failed to initialized controller connection... Is this an error?");
         }
 
+#ifdef __EMSCRIPTEN__
+        return;
+#endif
+
         control_thread = std::thread(controlLoop);
     }
 
     void endControlThread(void) {
+#ifdef __EMSCRIPTEN__
+        if (controller) SDL_GameControllerClose(controller);
+        return;
+#endif
+
         cancel_controls.store(true, std::memory_order_release);
-        control_thread.join();
+        if (control_thread.joinable()) {
+            control_thread.join();
+        }
 
         if (controller) SDL_GameControllerClose(controller);
+    }
+
+    void updateControls(void) {
+        if (!control_mutex.try_lock()) return;
+        pollControls();
+        control_mutex.unlock();
     }
 
 }

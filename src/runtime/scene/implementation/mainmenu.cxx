@@ -12,7 +12,13 @@ namespace Runtime {
         Runtime::loadHighScores();
         Runtime::_current_score = 0;
         Runtime::current_score = 0;
+        
+
+        #ifdef NO_ARCADE
+        Runtime::coin_display = Runtime::life_value*3;
+        #else 
         Runtime::coin_display = 0;
+        #endif
     }
 
 
@@ -110,7 +116,12 @@ namespace Runtime {
         SDL_Rect rect = {ARCADE_LOGIC_WIDTH*(ghostframe % 4), 0, ARCADE_LOGIC_WIDTH, ARCADE_LOGIC_HEIGHT};
         SDL_RenderCopy(Graphics::renderer, main_menu_ghost.get(), &rect, nullptr);
 
+        #ifndef NO_ARCADE
         Runtime::display_coins = true;
+        #else
+        Runtime::display_coins = false;
+        #endif
+        
         Runtime::drawCounter();
     }
 

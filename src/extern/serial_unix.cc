@@ -3,6 +3,8 @@
  * Additional Contributors: Christopher Baker @bakercp
  */
 
+#ifndef __EMSCRIPTEN__
+
 #if !defined(_WIN32)
 
 #include <stdio.h>
@@ -1056,3 +1058,5 @@ Serial::SerialImpl::writeUnlock ()
 }
 
 #endif // !defined(_WIN32)
+
+#endif // __EMSCRIPTEN__

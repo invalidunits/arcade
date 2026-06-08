@@ -2,6 +2,8 @@
 #include <SDL2/SDL_assert.h>
 #include "com.hxx"
 
+#ifndef NO_ARCADE
+
 
 #include <cctype>
 #include <thread>
@@ -97,3 +99,5 @@ namespace COM {
         }
     }
 } // namespace Serial
+
+#endif

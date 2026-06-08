@@ -1,3 +1,6 @@
+
+#ifndef __EMSCRIPTEN__
+
 /* Copyright 2012 William Woodall and John Harrison */
 #include <algorithm>
 
@@ -412,3 +415,5 @@ bool Serial::getCD ()
 {
   return pimpl_->getCD ();
 }
+
+#endif

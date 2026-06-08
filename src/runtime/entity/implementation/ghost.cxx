@@ -180,6 +180,8 @@ namespace Runtime {
                             eyeframe = 1; break;
                         case Pac::PACDirection::DOWN:
                             eyeframe = 2; break;
+                        default:
+                            break;
                     }
 
                     src = {ghost_width*(eyeframe + 6), 0, ghost_width, ghost_height};

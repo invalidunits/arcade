@@ -1,3 +1,4 @@
 build/
+build-ems/
 .vscode/
 com_rw/node_modules

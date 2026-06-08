@@ -1,8 +1,9 @@
-#include <extern/incbin.h>
+#include <extern/incbin.h> 
 
 
 
 extern "C" {
+
 	INCBIN(EmuLogic, "rom/emulogic.ttf");
 	INCBIN(ArcadePixPlus, "rom/arcadepix_plus.ttf");
 

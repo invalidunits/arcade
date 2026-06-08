@@ -127,7 +127,7 @@ namespace Runtime
         std::transform(lower.begin(), lower.end(), lower.begin(), tolower);
 
         printf("Checking username: ");
-        printf(str.data());
+        printf("%s", str.data());
         printf("\n");
         const char *awful_words = "ahole anus ass bitch c0ck c0cks c0k cawk cawks Clit cnts cntz cock cocks crap cum cunt cunts cuntz dick dild0 dildo dyke enema fag fag1t faget fagit fags fagz faig faigs fart fuck fucks fuk Fukah Fuken fuker Fukin Fukk g00k gay gays gayz h00r h0ar h0re hells hoar hoor hoore jap japs jisim jiss jizm jizz knob knobs knobz kunt kunts kuntz n1gr nastt packy paki pakie paky pen1s penas penis penus Phuc Phuck Phuk polac polak pr1c pr1ck pr1k pusse pussy puuke queer qweir scank semen sex sexy sh1t sh1ts sh1tz shit shits Shity shitz Shyt Shyte Shyty skank slut sluts slutz tit turd vulva w0p wh00r wh0re whore xxx bitch clit fuck shit ass b17ch b1tch c0ck cawk chink cipa clits cock cum cunt dildo dirsa fcuk fuk fux0r hoer hore jism kawk mofo nazi nig phuck pusse pussy slut smut teets tits boobs b00bs teez titt w00se wank whoar whore amcik ayir bi7ch cazzo chraa chuj d4mn daygo dego dupa Ekto faen fanny feces feg Fotze gay gook h0r h4x0r hell hui injun jizz kike kraut kuk Kurac kurwa lesbo mibun muie nazis perse picka pizda poop porn p0rn pr0n pula pule puta puto screw shiz spic suka twat vittu yed";
         while (*awful_words != '\0')
@@ -145,7 +145,7 @@ namespace Runtime
                 printf("Found ");
                 fwrite(awful_words, end_of_word-awful_words, 1, stdout);
                 printf(" in ");
-                printf(str.data());
+                printf("%s", str.data());
                 printf("\n");
                 return true;
             }
