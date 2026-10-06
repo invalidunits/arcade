@@ -16,6 +16,7 @@ namespace Runtime {
     class LiveCutscene : public Runtime::IntermissionBase, public Entity::EntityManager {
         constexpr static auto default_life_time = std::chrono::duration_cast<Runtime::duration>(Runtime::tick_length*ARCADE_LOGIC_WIDTH);
         unsigned int _coin_display = 0;
+        unsigned int _live_display = 0;
         
         public:
 

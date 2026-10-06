@@ -100,6 +100,8 @@ if (APPLE)
 	include_directories("/opt/homebrew/include")
 endif()
 
+target_compile_definitions(arcade_machine PRIVATE -DNO_ARCADE)
+
 
 include_directories("src/")
 

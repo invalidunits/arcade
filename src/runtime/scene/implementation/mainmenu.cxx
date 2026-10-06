@@ -12,13 +12,13 @@ namespace Runtime {
         Runtime::loadHighScores();
         Runtime::_current_score = 0;
         Runtime::current_score = 0;
-        
-
-        #ifdef NO_ARCADE
-        Runtime::coin_display = Runtime::life_value*3;
-        #else 
         Runtime::coin_display = 0;
-        #endif
+    }
+
+    void MainMenu::resume() {
+        Runtime::_current_score = 0;
+        Runtime::current_score = 0;
+        Runtime::coin_display = 0;
     }
 
 
@@ -62,9 +62,11 @@ namespace Runtime {
       
 
         if ((frame % 16) == 0) {
+            #ifndef NO_ARCADE
             if (enter_coin) {
                 Runtime::coin_display += 25;
             }
+            #endif
 
             if (start_button && can_start() && start <= 0) {
                 start = 30;
@@ -126,6 +128,10 @@ namespace Runtime {
     }
 
     bool MainMenu::can_start(void) {
+#ifndef NO_ARCADE
         return Runtime::coin_display >= Runtime::life_value;
+#else 
+        return true;
+#endif
     }
 }

@@ -37,7 +37,7 @@ namespace Runtime
             Graphics::drawText({150, 100 + int(i)*20, 0, 0}, std::to_string(it->second), Graphics::renderer);
         }
         if (change_it != high_scores.end()) {
-            Graphics::drawText({0, ARCADE_LOGIC_HEIGHT-50, 0, 0}, "Press Z to confirm your name.", Graphics::renderer);
+            Graphics::drawText({ARCADE_LOGIC_WIDTH/2, ARCADE_LOGIC_HEIGHT-50, 0, 0}, "Press Z to confirm your name.", Graphics::renderer, Math::color8a(~0, ~0, ~0, ~0), true);
         } else {
             Graphics::drawText({0, ARCADE_LOGIC_HEIGHT-20, 0, 0}, "Press B.", Graphics::renderer);
         }

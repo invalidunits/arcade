@@ -30,10 +30,11 @@ namespace Runtime {
         int start = 0;
 
         public: 
-            MainMenu();
-            void setup();
-            void update_fixed();
-            void draw();
+            MainMenu(void);
+            void setup(void);
+            void update_fixed(void);
+            void resume(void);
+            void draw(void);
         
         static bool can_start(void);
     };

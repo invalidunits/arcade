@@ -11,7 +11,12 @@ namespace Runtime {
         IntermissionBase::update_pac(pac);
         if (!pac->evaluated) {
             if ((pac->time_elapsed.count()/(float)pac->life_time.count()) > 0.5) {
+#ifndef NO_ARCADE
                 coin_display -= life_value;
+#else
+                _live_display += 1;
+                coin_update_frame = 3;
+#endif
                 pac->evaluated = true;
                 
                 std::printf("%d", int(pac->sprite));
@@ -26,7 +31,12 @@ namespace Runtime {
         level = 1;
         Runtime::_current_score = 0;
         Runtime::current_score = 0;
+        _live_display = 0;
+#ifndef NO_ARCADE
         live_count = coin_display/life_value;
+#else
+        live_count = 3;
+#endif
         int next_special_char = 4;
         m_state = 0;
 
@@ -37,20 +47,20 @@ namespace Runtime {
             pacmen.push_back(IntermissionBase::pac_t());
             pac_t &pac = pacmen.back();
             pac.sprite = pac_t::pacman;
-            pac.random = ((float)std::rand()) / RAND_MAX;
+            pac.random = ((float)std::rand()) / (float)RAND_MAX;
 
             pac.time_elapsed = -i*std::chrono::milliseconds(500);
             if (i > 4) {
                 pac.time_elapsed -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(
-                    250 + int(250*((float)std::rand()) / RAND_MAX)
+                    250 + int(250*((float)std::rand()) / (float)RAND_MAX)
                 ));
             }
 
             pac.life_time = default_life_time;
 
             if (i > 4) {
-                pac.time_elapsed -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(250*((float)std::rand()) / RAND_MAX)));
-                pac.life_time -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(2500*((float)std::rand()) / RAND_MAX)));
+                pac.time_elapsed -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(250*((float)std::rand()) / (float)RAND_MAX)));
+                pac.life_time -= std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(int(2500*((float)std::rand()) / (float)RAND_MAX)));
             }
 
             
@@ -70,8 +80,7 @@ namespace Runtime {
         IntermissionBase::update();
         if (pacmen.size() == 0) {
             m_do_stuff_timer -= Runtime::delta_time;
-            if (m_do_stuff_timer.count()) {
-                
+            if (m_do_stuff_timer.count() < 0) {
                 if (coin_display > 0) {
                     m_do_stuff_timer = std::chrono::duration_cast<Runtime::duration>(std::chrono::milliseconds(500));
                     coin_display -= 5;
@@ -129,10 +138,15 @@ namespace Runtime {
                             Math::color8a(~0, ~0, 0, ~0));
         coindraw.y -= cointrans;   
 
+        #ifndef NO_ARCADE
         Graphics::drawText(coindraw, 
             "$" + Math::to_string_with_precision(float(coin_display*coin_display_multiplier), 2), 
             Graphics::renderer, color, true);
-        
+        #else
+        Graphics::drawText(coindraw, 
+            Math::to_string_with_precision(_live_display, 0) + " Lives", 
+            Graphics::renderer, color, true);
+        #endif
         if (m_state >= 1) {
             Graphics::drawText(coindraw + Math::recti(0, 32, 0, 0),  
                 Math::to_string_with_precision(live_count, 0) + " Lives Total",
